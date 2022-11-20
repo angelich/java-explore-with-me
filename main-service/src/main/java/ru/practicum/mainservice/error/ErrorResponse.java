@@ -1,13 +1,10 @@
 package ru.practicum.mainservice.error;
 
 
-import lombok.Builder;
-
 import javax.validation.ConstraintViolation;
 import java.time.Instant;
 import java.util.Set;
 
-@Builder
 public class ErrorResponse {
     private Set<ConstraintViolation<?>> errors;
     private String message;

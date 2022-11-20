@@ -1,12 +1,8 @@
 package ru.practicum.mainservice.error;
 
-import lombok.Getter;
+public class NotFoundException extends RuntimeException {
 
-@Getter
-public class NotFoundException extends Throwable {
-    private final String message;
-
-    NotFoundException(String message) {
-        this.message = message;
+    public NotFoundException(String message) {
+        super(message);
     }
 }

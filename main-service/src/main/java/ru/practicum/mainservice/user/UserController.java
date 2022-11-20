@@ -33,8 +33,8 @@ public class UserController {
 
     @GetMapping
     List<UserDto> getUsers(@RequestParam(name = "ids") List<Long> ids,
-                           @RequestParam(value = "from", defaultValue = "0") Integer from,
-                           @RequestParam(value = "size", defaultValue = "10") Integer size) {
+                           @RequestParam(name = "from", defaultValue = "0") Integer from,
+                           @RequestParam(name = "size", defaultValue = "10") Integer size) {
         log.info("Get users={}, from={}, size={}", ids, from, size);
         PageRequest pageRequest = PageRequest.of(from / size, size);
         return userService.getUsers(ids, pageRequest);
