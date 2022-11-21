@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS event
     initiator          BIGINT                                  NOT NULL,
     location_lat       DOUBLE PRECISION,
     location_lon       DOUBLE PRECISION,
+    participant_limit  INT,
     CONSTRAINT pk_event PRIMARY KEY (event_id),
     CONSTRAINT fk_category FOREIGN KEY (category_id) REFERENCES category,
     CONSTRAINT fk_initiator FOREIGN KEY (initiator) REFERENCES users
