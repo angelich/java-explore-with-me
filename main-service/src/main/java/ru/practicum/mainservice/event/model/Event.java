@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.practicum.mainservice.category.model.Category;
+import ru.practicum.mainservice.compilation.Compilation;
 import ru.practicum.mainservice.event.EventState;
 import ru.practicum.mainservice.user.model.User;
 
@@ -17,9 +18,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.time.Instant;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -70,4 +74,10 @@ public class Event {
     private User initiator;
 
     private int participantLimit;
+
+    @ManyToMany
+    @JoinTable(name = "event_compilation",
+            joinColumns = @JoinColumn(name = "event_id"),
+            inverseJoinColumns = @JoinColumn(name = "compilation_id"))
+    private Set<Compilation> compilations;
 }
