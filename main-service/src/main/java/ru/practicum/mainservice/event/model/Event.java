@@ -23,6 +23,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Getter
@@ -45,7 +46,7 @@ public class Event {
     private String description;
 
     @Column(nullable = false)
-    private Instant eventDate;
+    private LocalDateTime eventDate;
 
     @Column(nullable = false)
     private Boolean paid;
@@ -54,7 +55,7 @@ public class Event {
     private Boolean requestModeration;
 
     @Column(nullable = false)
-    private Instant created;
+    private LocalDateTime created;
 
     @Column(nullable = false)
     private Instant published;
