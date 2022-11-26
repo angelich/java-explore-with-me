@@ -10,4 +10,10 @@ public interface RequestService {
     ParticipationRequestDto confirmRequest(Long userId, Long eventId, Long reqId);
 
     ParticipationRequestDto rejectRequest(Long userId, Long eventId, Long reqId);
+
+    ParticipationRequestDto getUserRequests(Long userId);
+
+    ParticipationRequestDto createUserRequest(Long userId, Long eventId);
+
+    ParticipationRequestDto cancelUserRequest(Long userId, Long requestId);
 }
