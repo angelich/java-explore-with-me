@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.practicum.mainservice.category.model.Category;
-import ru.practicum.mainservice.compilation.Compilation;
+import ru.practicum.mainservice.compilation.model.Compilation;
 import ru.practicum.mainservice.event.EventState;
 import ru.practicum.mainservice.user.model.User;
 
