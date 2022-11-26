@@ -1,7 +1,8 @@
 package ru.practicum.mainservice.error;
 
 
-import javax.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolation;
+
 import java.time.Instant;
 import java.util.Set;
 

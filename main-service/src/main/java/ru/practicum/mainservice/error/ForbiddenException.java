@@ -3,10 +3,10 @@ package ru.practicum.mainservice.error;
 import lombok.Getter;
 
 @Getter
-public class ForbiddenException extends Throwable {
+public class ForbiddenException extends RuntimeException {
     private final String message;
 
-    ForbiddenException(String message) {
+    public ForbiddenException(String message) {
         this.message = message;
     }
 }

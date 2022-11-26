@@ -22,7 +22,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -58,7 +57,7 @@ public class Event {
     private LocalDateTime created;
 
     @Column(nullable = false)
-    private Instant published;
+    private LocalDateTime published;
 
     @Enumerated(EnumType.ORDINAL)
     private EventState state;

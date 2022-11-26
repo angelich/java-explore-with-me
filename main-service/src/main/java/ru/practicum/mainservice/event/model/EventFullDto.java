@@ -11,7 +11,6 @@ import ru.practicum.mainservice.category.model.CategoryDto;
 import ru.practicum.mainservice.event.EventState;
 import ru.practicum.mainservice.user.model.UserDto;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Getter
@@ -27,7 +26,7 @@ public class EventFullDto {
     private String description;
     private CategoryDto category;
     private Integer confirmedRequests;
-    private Instant eventDate;
+    private LocalDateTime eventDate;
     private UserDto initiator;
     private Location location;
     private Boolean paid;

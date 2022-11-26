@@ -1,6 +1,7 @@
 package ru.practicum.mainservice.event.model;
 
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,7 +10,6 @@ import lombok.Setter;
 import lombok.ToString;
 import ru.practicum.mainservice.category.model.CategoryDto;
 
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Getter

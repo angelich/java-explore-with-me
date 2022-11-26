@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.mainservice.event.model.AdminUpdateEventRequest;
 import ru.practicum.mainservice.event.model.EventFullDto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,11 +30,11 @@ public class EventAdminController {
     private final EventService eventService;
 
     @GetMapping
-    List<EventFullDto> getEvents(@RequestParam(name = "users") List<Integer> users,
+    List<EventFullDto> getEvents(@RequestParam(name = "users") List<Long> users,
                                  @RequestParam(name = "states") List<String> states,
-                                 @RequestParam(name = "categories") List<Integer> categories,
-                                 @RequestParam(name = "rangeStart") String rangeStart,
-                                 @RequestParam(name = "rangeEnd") String rangeEnd,
+                                 @RequestParam(name = "categories") List<Long> categories,
+                                 @RequestParam(name = "rangeStart") LocalDateTime rangeStart,
+                                 @RequestParam(name = "rangeEnd") LocalDateTime rangeEnd,
                                  @RequestParam(name = "from", defaultValue = "0") Integer from,
                                  @RequestParam(name = "size", defaultValue = "10") Integer size) {
         log.info("Getting events by admin with parameters: users={}, states={}, categories={}, rangeStart={}, rangeEnd={}, from={}, size={}",
@@ -43,24 +44,24 @@ public class EventAdminController {
                 .collect(Collectors.toList());
 
         PageRequest pageRequest = PageRequest.of(from / size, size);
-        return eventService.getEventsByAdmin(users, eventStates, categories, rangeStart, rangeEnd, pageRequest);
+        return eventService.findEventsByAdmin(users, eventStates, categories, rangeStart, rangeEnd, pageRequest);
     }
 
     @PutMapping("/{eventId}")
-    EventFullDto editEventByAdmin(@PathVariable(name = "eventId") Integer eventId,
+    EventFullDto editEventByAdmin(@PathVariable(name = "eventId") Long eventId,
                                   @RequestBody AdminUpdateEventRequest editEventRequest) {
         log.info("Edit event={} by admin: request={}", eventId, editEventRequest);
         return eventService.editEventByAdmin(eventId, editEventRequest);
     }
 
     @PatchMapping("/{eventId}/publish")
-    EventFullDto publishEvent(@PathVariable(name = "eventId") Integer eventId) {
+    EventFullDto publishEvent(@PathVariable(name = "eventId") Long eventId) {
         log.info("Publish event={}", eventId);
         return eventService.publishEvent(eventId);
     }
 
     @PatchMapping("/{eventId}/reject")
-    EventFullDto rejectEvent(@PathVariable(name = "eventId") Integer eventId) {
+    EventFullDto rejectEvent(@PathVariable(name = "eventId") Long eventId) {
         log.info("Reject event={}", eventId);
         return eventService.rejectEvent(eventId);
     }

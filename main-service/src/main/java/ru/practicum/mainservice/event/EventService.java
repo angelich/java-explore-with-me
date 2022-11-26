@@ -7,21 +7,22 @@ import ru.practicum.mainservice.event.model.EventShortDto;
 import ru.practicum.mainservice.event.model.NewEventDto;
 import ru.practicum.mainservice.event.model.UpdateEventRequest;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface EventService {
-    List<EventFullDto> getEventsByAdmin(List<Integer> users,
-                                        List<EventState> eventStates,
-                                        List<Integer> categories,
-                                        String rangeStart,
-                                        String rangeEnd,
-                                        PageRequest pageRequest);
+    List<EventFullDto> findEventsByAdmin(List<Long> users,
+                                         List<EventState> eventStates,
+                                         List<Long> categories,
+                                         LocalDateTime rangeStart,
+                                         LocalDateTime rangeEnd,
+                                         PageRequest pageRequest);
 
-    EventFullDto editEventByAdmin(Integer eventId, AdminUpdateEventRequest editEventRequest);
+    EventFullDto editEventByAdmin(Long eventId, AdminUpdateEventRequest editEventRequest);
 
-    EventFullDto publishEvent(Integer eventId);
+    EventFullDto publishEvent(Long eventId);
 
-    EventFullDto rejectEvent(Integer eventId);
+    EventFullDto rejectEvent(Long eventId);
 
     List<EventShortDto> getUserEvents(Long userId, PageRequest pageRequest);
 
