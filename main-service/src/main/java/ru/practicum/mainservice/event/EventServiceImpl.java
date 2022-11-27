@@ -1,5 +1,6 @@
 package ru.practicum.mainservice.event;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -211,6 +212,62 @@ public class EventServiceImpl implements EventService {
         }
         event.setState(CANCELLED);
         var eventFullDto = toEventFullDto(eventRepository.save(event));
+        // eventFullDto.setViews();
+        eventFullDto.setConfirmedRequests(requestRepository.countRequestByEvent_Id(eventId));
+        return eventFullDto;
+    }
+
+    @Override
+    public List<EventShortDto> findEvents(String text,
+                                          List<Long> categories,
+                                          Boolean paid,
+                                          LocalDateTime rangeStart,
+                                          LocalDateTime rangeEnd,
+                                          Boolean onlyAvailable,
+                                          EventSortType sortType,
+                                          PageRequest pageRequest) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (text != null) {
+            builder.and(QEvent.event.annotation.containsIgnoreCase(text)
+                    .or(QEvent.event.description.containsIgnoreCase(text)));
+        }
+        if (categories != null) {
+            builder.and(QEvent.event.category.id.in(categories));
+        }
+        if (paid != null) {
+            builder.and(QEvent.event.paid.eq(paid));
+        }
+        if (rangeStart != null && rangeEnd != null) {
+            builder.and(QEvent.event.eventDate.between(rangeStart, rangeEnd));
+        }
+        builder.and(QEvent.event.state.eq(PUBLISHED));
+
+        var events = eventRepository.findAll(builder, pageRequest);
+
+        //BooleanExpression byAvailable = QEvent.event.participantLimit.lt(QRequest.request.);
+        // в конце сорировка еще?
+        var eventsShortDtoList = events
+                .stream()
+                .map(EventMapper::toEventShortDto)
+                .collect(Collectors.toList());
+
+        eventsShortDtoList.forEach(it -> {
+            // it.setViews();
+            it.setConfirmedRequests(requestRepository.countRequestByEvent_Id(it.getId()));
+        });
+        return eventsShortDtoList;
+    }
+
+    @Override
+    public EventFullDto getEvent(Long eventId, String remoteIp, String requestURI) {
+        var event = eventRepository.findById(eventId).orElseThrow(
+                () -> new NotFoundException("Event not exist"));
+        if (PUBLISHED != event.getState()) {
+            throw new ForbiddenException("For the requested operation the conditions are not met");
+        }
+
+        var eventFullDto = toEventFullDto(event);
         // eventFullDto.setViews();
         eventFullDto.setConfirmedRequests(requestRepository.countRequestByEvent_Id(eventId));
         return eventFullDto;
