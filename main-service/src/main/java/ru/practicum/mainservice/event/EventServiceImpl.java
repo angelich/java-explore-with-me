@@ -154,8 +154,8 @@ public class EventServiceImpl implements EventService {
             savedEvent.setTitle(updateEventRequest.getTitle());
         }
         if (updateEventRequest.getEventDate() != null) {
-            if (updateEventRequest.getEventDate().isAfter(now().minusHours(2L))) {
-                throw new IllegalArgumentException("Event time should be earlier");
+            if (updateEventRequest.getEventDate().isBefore(now().plusHours(2L))) {
+                throw new IllegalArgumentException("Event time should not be earlier than: " + now().plusHours(2L));
             }
             savedEvent.setEventDate(updateEventRequest.getEventDate());
         }
@@ -169,16 +169,50 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
-        return null;
+        var user = userRepository.findById(userId).orElseThrow(
+                () -> new NotFoundException("User not exist"));
+        var eventCategory = categoryRepository.findById(newEventDto.getCategory()).orElseThrow(
+                () -> new NotFoundException("Category not exist"));
+        if (newEventDto.getEventDate().isBefore(now().plusHours(2L))) {
+            throw new IllegalArgumentException("Event time should not be earlier than: " + now().plusHours(2L));
+        }
+
+        var savedEvent = eventRepository.save(toEvent(newEventDto, eventCategory, user));
+        var eventFullDto = toEventFullDto(savedEvent);
+        // eventFullDto.setViews();
+        eventFullDto.setConfirmedRequests(requestRepository.countRequestByEvent_Id(savedEvent.getId()));
+        return eventFullDto;
+
     }
 
     @Override
     public EventFullDto getFullEventInfo(Long userId, Long eventId) {
-        return null;
+        var user = userRepository.findById(userId).orElseThrow(
+                () -> new NotFoundException("User not exist"));
+        var event = eventRepository.findById(eventId).orElseThrow(
+                () -> new NotFoundException("Event not exist"));
+        if (event.getInitiator().equals(user)) {
+            throw new ForbiddenException("For the requested operation the conditions are not met");
+        }
+        var eventFullDto = toEventFullDto(event);
+        // eventFullDto.setViews();
+        eventFullDto.setConfirmedRequests(requestRepository.countRequestByEvent_Id(eventId));
+        return eventFullDto;
     }
 
     @Override
     public EventFullDto cancelEvent(Long userId, Long eventId) {
-        return null;
+        var user = userRepository.findById(userId).orElseThrow(
+                () -> new NotFoundException("User not exist"));
+        var event = eventRepository.findById(eventId).orElseThrow(
+                () -> new NotFoundException("Event not exist"));
+        if (event.getInitiator().equals(user)) {
+            throw new ForbiddenException("For the requested operation the conditions are not met");
+        }
+        event.setState(CANCELLED);
+        var eventFullDto = toEventFullDto(eventRepository.save(event));
+        // eventFullDto.setViews();
+        eventFullDto.setConfirmedRequests(requestRepository.countRequestByEvent_Id(eventId));
+        return eventFullDto;
     }
 }

@@ -9,7 +9,10 @@ import ru.practicum.mainservice.event.model.Event;
 import ru.practicum.mainservice.event.model.EventFullDto;
 import ru.practicum.mainservice.event.model.EventShortDto;
 import ru.practicum.mainservice.event.model.Location;
+import ru.practicum.mainservice.event.model.NewEventDto;
+import ru.practicum.mainservice.user.model.User;
 
+import static java.time.LocalDateTime.now;
 import static ru.practicum.mainservice.user.UserMapper.toUserDto;
 
 public final class EventMapper {
@@ -57,6 +60,24 @@ public final class EventMapper {
                 .initiator(oldEventData.getInitiator())
                 .participantLimit(request.getParticipantLimit())
                 .compilations(oldEventData.getCompilations())
+                .build();
+    }
+
+    public static Event toEvent(NewEventDto request, Category category, User initiator) {
+        return Event.builder()
+                .title(request.getTitle())
+                .annotation(request.getAnnotation())
+                .description(request.getDescription())
+                .eventDate(request.getEventDate())
+                .paid(request.getPaid())
+                .requestModeration(request.getRequestModeration())
+                .created(now())
+                .state(EventState.AWAITING)
+                .locationLat(request.getLocation().getLat())
+                .locationLon(request.getLocation().getLon())
+                .category(category)
+                .initiator(initiator)
+                .participantLimit(request.getParticipantLimit())
                 .build();
     }
 

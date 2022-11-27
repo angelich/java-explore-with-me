@@ -26,7 +26,7 @@ public class NewEventDto {
     private String annotation;
 
     @NotNull(message = "category should be provided")
-    private Integer category;
+    private Long category;
 
     @Min(20L)
     @Max(7000L)
