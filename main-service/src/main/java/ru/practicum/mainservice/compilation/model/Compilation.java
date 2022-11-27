@@ -14,7 +14,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
@@ -36,5 +36,5 @@ public class Compilation {
     private Boolean pinned;
 
     @ManyToMany(mappedBy = "compilations")
-    private Set<Event> events;
+    private List<Event> events;
 }

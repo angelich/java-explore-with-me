@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import ru.practicum.mainservice.event.model.EventShortDto;
 
 import java.util.List;
 
@@ -19,11 +18,10 @@ import java.util.List;
 @NoArgsConstructor
 @ToString
 public class NewCompilationDto {
-    private Long id;
     private Boolean pinned = false;
 
     @NotNull(message = "Title can't be null")
     @NotBlank(message = "Title can't be blank")
     private String title;
-    private List<EventShortDto> events;
+    private List<Long> events;
 }
