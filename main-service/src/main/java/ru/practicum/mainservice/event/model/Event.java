@@ -70,7 +70,7 @@ public class Event {
     private Category category;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "initiator")
     private User initiator;
 
     private int participantLimit;

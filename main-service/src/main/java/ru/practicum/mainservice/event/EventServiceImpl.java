@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.mainservice.category.CategoryRepository;
+import ru.practicum.mainservice.client.StatServiceClient;
 import ru.practicum.mainservice.error.ForbiddenException;
 import ru.practicum.mainservice.error.NotFoundException;
 import ru.practicum.mainservice.event.model.AdminUpdateEventRequest;
@@ -15,6 +16,7 @@ import ru.practicum.mainservice.event.model.NewEventDto;
 import ru.practicum.mainservice.event.model.QEvent;
 import ru.practicum.mainservice.event.model.UpdateEventRequest;
 import ru.practicum.mainservice.request.RequestRepository;
+import ru.practicum.mainservice.stats.EndpointHit;
 import ru.practicum.mainservice.user.UserRepository;
 
 import java.time.LocalDateTime;
@@ -34,6 +36,7 @@ public class EventServiceImpl implements EventService {
     private final RequestRepository requestRepository;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
+    private final StatServiceClient client;
 
     @Override
     public List<EventFullDto> findEventsByAdmin(
@@ -266,6 +269,8 @@ public class EventServiceImpl implements EventService {
         if (PUBLISHED != event.getState()) {
             throw new ForbiddenException("For the requested operation the conditions are not met");
         }
+
+        client.hit(new EndpointHit("app", requestURI, remoteIp, now()));
 
         var eventFullDto = toEventFullDto(event);
         // eventFullDto.setViews();

@@ -1,6 +1,5 @@
 package ru.practicum.mainservice.event.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.PageRequest;
@@ -21,6 +20,7 @@ import ru.practicum.mainservice.event.model.UpdateEventRequest;
 import ru.practicum.mainservice.request.RequestService;
 import ru.practicum.mainservice.request.model.ParticipationRequestDto;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
