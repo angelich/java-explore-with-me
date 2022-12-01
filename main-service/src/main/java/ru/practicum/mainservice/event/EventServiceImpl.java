@@ -16,8 +16,8 @@ import ru.practicum.mainservice.event.model.NewEventDto;
 import ru.practicum.mainservice.event.model.QEvent;
 import ru.practicum.mainservice.event.model.UpdateEventRequest;
 import ru.practicum.mainservice.request.RequestRepository;
-import ru.practicum.mainservice.stats.EndpointHit;
 import ru.practicum.mainservice.user.UserRepository;
+import ru.practicum.statservice.stats.model.EndpointHitDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -270,7 +270,7 @@ public class EventServiceImpl implements EventService {
             throw new ForbiddenException("For the requested operation the conditions are not met");
         }
 
-        client.hit(new EndpointHit("app", requestURI, remoteIp, now()));
+        client.hit(new EndpointHitDto("app", requestURI, remoteIp, now()));
 
         var eventFullDto = toEventFullDto(event);
         // eventFullDto.setViews();

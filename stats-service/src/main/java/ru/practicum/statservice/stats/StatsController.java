@@ -1,4 +1,4 @@
-package ru.practicum.mainservice.stats;
+package ru.practicum.statservice.stats;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.practicum.mainservice.stats.model.EndpointHit;
-import ru.practicum.mainservice.stats.model.ViewStats;
-import ru.practicum.mainservice.stats.service.StatsService;
+import ru.practicum.statservice.stats.model.EndpointHit;
+import ru.practicum.statservice.stats.model.ViewStats;
+import ru.practicum.statservice.stats.service.StatsService;
 
 import java.time.LocalDateTime;
 import java.util.List;

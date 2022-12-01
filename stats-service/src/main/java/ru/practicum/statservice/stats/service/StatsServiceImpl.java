@@ -1,10 +1,10 @@
-package ru.practicum.mainservice.stats.service;
+package ru.practicum.statservice.stats.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.mainservice.stats.StatsRepository;
-import ru.practicum.mainservice.stats.model.EndpointHit;
-import ru.practicum.mainservice.stats.model.ViewStats;
+import ru.practicum.statservice.stats.StatsRepository;
+import ru.practicum.statservice.stats.model.EndpointHit;
+import ru.practicum.statservice.stats.model.ViewStats;
 
 import java.time.LocalDateTime;
 import java.util.List;

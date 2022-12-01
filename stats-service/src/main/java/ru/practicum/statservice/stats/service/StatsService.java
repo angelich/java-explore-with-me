@@ -1,8 +1,8 @@
-package ru.practicum.mainservice.stats.service;
+package ru.practicum.statservice.stats.service;
 
 
-import ru.practicum.mainservice.stats.model.EndpointHit;
-import ru.practicum.mainservice.stats.model.ViewStats;
+import ru.practicum.statservice.stats.model.EndpointHit;
+import ru.practicum.statservice.stats.model.ViewStats;
 
 import java.time.LocalDateTime;
 import java.util.List;
