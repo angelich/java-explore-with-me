@@ -26,7 +26,7 @@ public class StatServiceClient {
     private static final String STATS_ENDPOINT = "/stats";
 
     @Autowired
-    StatServiceClient(@Value("${stat-service.url}") String host, RestTemplateBuilder builder) {
+    StatServiceClient(@Value("${stats-server.url}") String host, RestTemplateBuilder builder) {
         this.rest = builder
                 .uriTemplateHandler(new DefaultUriBuilderFactory(host))
                 .requestFactory(HttpComponentsClientHttpRequestFactory::new)
