@@ -301,7 +301,7 @@ public class EventServiceImpl implements EventService {
                                           Boolean paid,
                                           LocalDateTime rangeStart,
                                           LocalDateTime rangeEnd,
-                                          Boolean onlyAvailable,
+                                          boolean onlyAvailable,
                                           EventSortType sortType,
                                           PageRequest pageRequest,
                                           String remoteIp,
@@ -323,11 +323,16 @@ public class EventServiceImpl implements EventService {
         if (rangeStart != null && rangeEnd != null) {
             builder.and(QEvent.event.eventDate.between(rangeStart, rangeEnd));
         }
+        if (onlyAvailable) {
+            builder
+                    .andNot(QEvent.event.requestModeration.isTrue()
+                            .and(QEvent.event.participantLimit
+                                    .goe(QEvent.event.requests.size())));
+        }
         builder.and(QEvent.event.state.eq(PUBLISHED));
 
         var events = eventRepository.findAll(builder, pageRequest);
 
-        //BooleanExpression byAvailable = QEvent.event.participantLimit.lt(QRequest.request.);
 
         var eventsShortDtoList = events
                 .stream()

@@ -33,7 +33,7 @@ public class EventPublicController {
     @GetMapping
     List<EventShortDto> findEvents(@RequestParam(name = "text", required = false) String text,
                                    @RequestParam(name = "categories", required = false) List<Long> categories,
-                                   @RequestParam(name = "paid", required = false) Boolean paid,
+                                   @RequestParam(name = "paid", required = false) boolean paid,
                                    @RequestParam(name = "rangeStart", required = false) String rangeStart,
                                    @RequestParam(name = "rangeEnd", required = false) String rangeEnd,
                                    @RequestParam(name = "onlyAvailable", defaultValue = "false") Boolean onlyAvailable,
@@ -47,8 +47,8 @@ public class EventPublicController {
         log.info("client ip: {}", request.getRemoteAddr());
         log.info("endpoint path: {}", request.getRequestURI());
 
-        var startTime = LocalDateTime.parse(rangeStart, ofPattern(DATE_TIME_FORMAT));
-        var endTime = LocalDateTime.parse(rangeEnd, ofPattern(DATE_TIME_FORMAT));
+        var startTime = null != rangeStart ? LocalDateTime.parse(rangeStart, ofPattern(DATE_TIME_FORMAT)) : null;
+        var endTime = null != rangeEnd ? LocalDateTime.parse(rangeEnd, ofPattern(DATE_TIME_FORMAT)) : null;
 
         EventSortType sortType = EventSortType.from(sort).orElse(null);
         PageRequest pageRequest = PageRequest.of(from / size, size);

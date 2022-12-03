@@ -41,7 +41,7 @@ public interface EventService {
                                    Boolean paid,
                                    LocalDateTime rangeStart,
                                    LocalDateTime rangeEnd,
-                                   Boolean onlyAvailable,
+                                   boolean onlyAvailable,
                                    EventSortType sortType,
                                    PageRequest pageRequest,
                                    String remoteIp,

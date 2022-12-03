@@ -8,6 +8,7 @@ import lombok.Setter;
 import ru.practicum.mainservice.category.model.Category;
 import ru.practicum.mainservice.compilation.model.Compilation;
 import ru.practicum.mainservice.event.EventState;
+import ru.practicum.mainservice.request.model.Request;
 import ru.practicum.mainservice.user.model.User;
 
 import javax.persistence.Column;
@@ -21,8 +22,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -80,4 +83,7 @@ public class Event {
             joinColumns = @JoinColumn(name = "event_id"),
             inverseJoinColumns = @JoinColumn(name = "compilation_id"))
     private Set<Compilation> compilations;
+
+    @OneToMany(mappedBy = "event")
+    private List<Request> requests;
 }
