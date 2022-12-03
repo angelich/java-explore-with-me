@@ -17,6 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static java.time.format.DateTimeFormatter.ofPattern;
+
 /**
  * Публичный контроллер для работы с событиями
  */
@@ -26,13 +28,14 @@ import java.util.List;
 @RequestMapping(path = "/events")
 public class EventPublicController {
     private final EventService eventService;
+    private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     @GetMapping
     List<EventShortDto> findEvents(@RequestParam(name = "text") String text,
                                    @RequestParam(name = "categories") List<Long> categories,
                                    @RequestParam(name = "paid") Boolean paid,
-                                   @RequestParam(name = "rangeStart") LocalDateTime rangeStart,
-                                   @RequestParam(name = "rangeEnd") LocalDateTime rangeEnd,
+                                   @RequestParam(name = "rangeStart") String rangeStart,
+                                   @RequestParam(name = "rangeEnd") String rangeEnd,
                                    @RequestParam(name = "onlyAvailable", defaultValue = "false") Boolean onlyAvailable,
                                    @RequestParam(name = "sort") String sort,
                                    @RequestParam(name = "from", defaultValue = "0") Integer from,
@@ -44,6 +47,9 @@ public class EventPublicController {
         log.info("client ip: {}", request.getRemoteAddr());
         log.info("endpoint path: {}", request.getRequestURI());
 
+        var startTime = LocalDateTime.parse(rangeStart, ofPattern(DATE_TIME_FORMAT));
+        var endTime = LocalDateTime.parse(rangeEnd, ofPattern(DATE_TIME_FORMAT));
+
         EventSortType sortType = EventSortType.from(sort)
                 .orElseThrow(() -> new IllegalArgumentException("Unknown state: " + sort));
         PageRequest pageRequest = PageRequest.of(from / size, size);
@@ -51,8 +57,8 @@ public class EventPublicController {
                 text,
                 categories,
                 paid,
-                rangeStart,
-                rangeEnd,
+                startTime,
+                endTime,
                 onlyAvailable,
                 sortType,
                 pageRequest,

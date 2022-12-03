@@ -20,6 +20,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.time.format.DateTimeFormatter.ofPattern;
+
 
 /**
  * Приватный контроллер для работы с событиями
@@ -30,13 +32,14 @@ import java.util.stream.Collectors;
 @RequestMapping(path = "/admin/events")
 public class EventAdminController {
     private final EventService eventService;
+    private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     @GetMapping
     List<EventFullDto> getEvents(@RequestParam(name = "users") List<Long> users,
                                  @RequestParam(name = "states") List<String> states,
                                  @RequestParam(name = "categories") List<Long> categories,
-                                 @RequestParam(name = "rangeStart") LocalDateTime rangeStart,
-                                 @RequestParam(name = "rangeEnd") LocalDateTime rangeEnd,
+                                 @RequestParam(name = "rangeStart") String rangeStart,
+                                 @RequestParam(name = "rangeEnd") String rangeEnd,
                                  @RequestParam(name = "from", defaultValue = "0") Integer from,
                                  @RequestParam(name = "size", defaultValue = "10") Integer size) {
         log.info("Getting events by admin with parameters: users={}, states={}, categories={}, rangeStart={}, rangeEnd={}, from={}, size={}",
@@ -45,8 +48,11 @@ public class EventAdminController {
                 .map(EventState::valueOf)
                 .collect(Collectors.toList());
 
+        var startTime = LocalDateTime.parse(rangeStart, ofPattern(DATE_TIME_FORMAT));
+        var endTime = LocalDateTime.parse(rangeEnd, ofPattern(DATE_TIME_FORMAT));
+
         PageRequest pageRequest = PageRequest.of(from / size, size);
-        return eventService.findEventsByAdmin(users, eventStates, categories, rangeStart, rangeEnd, pageRequest);
+        return eventService.findEventsByAdmin(users, eventStates, categories, startTime, endTime, pageRequest);
     }
 
     @PutMapping("/{eventId}")
