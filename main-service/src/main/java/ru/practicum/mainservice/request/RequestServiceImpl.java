@@ -12,6 +12,7 @@ import ru.practicum.mainservice.user.UserRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.time.LocalDateTime.now;
 import static ru.practicum.mainservice.event.EventState.PUBLISHED;
 import static ru.practicum.mainservice.request.RequestMapper.toParticipationRequestDto;
 import static ru.practicum.mainservice.request.RequestStatus.CONFIRMED;
@@ -94,6 +95,7 @@ public class RequestServiceImpl implements RequestService {
         var newRequest = Request.builder()
                 .requester(user)
                 .event(event)
+                .created(now())
                 .build();
 
         if (event.getRequestModeration()) {

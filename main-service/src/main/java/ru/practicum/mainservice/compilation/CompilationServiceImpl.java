@@ -1,11 +1,14 @@
 package ru.practicum.mainservice.compilation;
 
+import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.mainservice.compilation.model.CompilationDto;
 import ru.practicum.mainservice.compilation.model.NewCompilationDto;
+import ru.practicum.mainservice.compilation.model.QCompilation;
 import ru.practicum.mainservice.error.NotFoundException;
+import ru.practicum.mainservice.event.EventMapper;
 import ru.practicum.mainservice.event.EventRepository;
 import ru.practicum.mainservice.event.model.Event;
 
@@ -23,10 +26,21 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     public List<CompilationDto> getCompilations(Boolean pinned, PageRequest pageRequest) {
-        return compilationRepository.findAllByPinned(pinned, pageRequest)
+        BooleanBuilder builder = new BooleanBuilder();
+        if (pinned != null && pinned) {
+            builder.and(QCompilation.compilation.pinned.isTrue());
+        } else if (pinned != null) {
+            builder.and(QCompilation.compilation.pinned.isFalse());
+        }
+
+        return compilationRepository.findAll(builder, pageRequest)
                 .stream()
                 .map(CompilationMapper::toCompilationDto)
-                // .peek(compilationDto -> compilationDto.setEvents(eventRepository.findAll().))
+                .peek(compilationDto -> compilationDto.setEvents(
+                        eventRepository.getEventsFromCompilation(compilationDto.getId())
+                                .stream()
+                                .map(EventMapper::toEventShortDto)
+                                .collect(Collectors.toList())))
                 .collect(Collectors.toList());
     }
 

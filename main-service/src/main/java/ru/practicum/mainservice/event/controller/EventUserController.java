@@ -55,21 +55,21 @@ public class EventUserController {
         return eventService.createEvent(userId, newEventDto);
     }
 
-    @GetMapping("/events/{eventId}")
+    @GetMapping("/{eventId}")
     EventFullDto getFullEventInfo(@PathVariable(name = "userId") Long userId,
                                   @PathVariable(name = "eventId") Long eventId) {
         log.info("Getting full event info: event={}, user={}", eventId, userId);
         return eventService.getFullEventInfo(userId, eventId);
     }
 
-    @PatchMapping("/events/{eventId}")
+    @PatchMapping("/{eventId}")
     EventFullDto cancelEvent(@PathVariable(name = "userId") Long userId,
                              @PathVariable(name = "eventId") Long eventId) {
         log.info("Cancel event by owner: event={}, user={}", eventId, userId);
         return eventService.cancelEvent(userId, eventId);
     }
 
-    @GetMapping("/events/{eventId}/requests")
+    @GetMapping("/{eventId}/requests")
     List<ParticipationRequestDto> getEventRequests(@PathVariable(name = "userId") Long userId,
                                                    @PathVariable(name = "eventId") Long eventId) {
         log.info("Getting event requests: event={}, user={}", eventId, userId);

@@ -1,7 +1,6 @@
 package ru.practicum.mainservice.event;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -55,17 +54,22 @@ public class EventServiceImpl implements EventService {
             LocalDateTime rangeEnd,
             PageRequest pageRequest) {
 
-        BooleanExpression byUserIds = QEvent.event.initiator.id.in(users);
-        BooleanExpression byEventState = QEvent.event.state.in(eventStates);
-        BooleanExpression byCategories = QEvent.event.category.id.in(categories);
-        BooleanExpression byPeriod = QEvent.event.eventDate.between(rangeStart, rangeEnd);
+        BooleanBuilder builder = new BooleanBuilder();
 
-        var events = eventRepository.findAll(
-                        byUserIds.and(byEventState)
-                                .and(byCategories)
-                                .and(byCategories)
-                                .and(byPeriod),
-                        pageRequest)
+        if (users != null) {
+            builder.and(QEvent.event.initiator.id.in(users));
+        }
+        if (eventStates != null) {
+            builder.and(QEvent.event.state.in(eventStates));
+        }
+        if (categories != null) {
+            builder.and(QEvent.event.category.id.in(categories));
+        }
+        if (rangeStart != null && rangeEnd != null) {
+            builder.and(QEvent.event.eventDate.between(rangeStart, rangeEnd));
+        }
+
+        var events = eventRepository.findAll(builder, pageRequest)
                 .stream()
                 .map(EventMapper::toEventFullDto)
                 .collect(Collectors.toList());
@@ -214,7 +218,7 @@ public class EventServiceImpl implements EventService {
             savedEvent.setEventDate(updateEventRequest.getEventDate());
         }
 
-        savedEvent.setState(EventState.AWAITING);
+        savedEvent.setState(EventState.PENDING);
         var eventFullDto = toEventFullDto(eventRepository.save(savedEvent));
 
         var viewsStats = getEventsStats(savedEvent.getCreated(), now(), List.of("/events/" + savedEvent.getId()), false)

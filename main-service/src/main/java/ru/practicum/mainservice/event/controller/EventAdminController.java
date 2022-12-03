@@ -35,21 +35,24 @@ public class EventAdminController {
     private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     @GetMapping
-    List<EventFullDto> getEvents(@RequestParam(name = "users") List<Long> users,
-                                 @RequestParam(name = "states") List<String> states,
-                                 @RequestParam(name = "categories") List<Long> categories,
-                                 @RequestParam(name = "rangeStart") String rangeStart,
-                                 @RequestParam(name = "rangeEnd") String rangeEnd,
+    List<EventFullDto> getEvents(@RequestParam(name = "users", required = false) List<Long> users,
+                                 @RequestParam(name = "states", required = false) List<String> states,
+                                 @RequestParam(name = "categories", required = false) List<Long> categories,
+                                 @RequestParam(name = "rangeStart", required = false) String rangeStart,
+                                 @RequestParam(name = "rangeEnd", required = false) String rangeEnd,
                                  @RequestParam(name = "from", defaultValue = "0") Integer from,
                                  @RequestParam(name = "size", defaultValue = "10") Integer size) {
         log.info("Getting events by admin with parameters: users={}, states={}, categories={}, rangeStart={}, rangeEnd={}, from={}, size={}",
                 users, states, categories, rangeStart, rangeEnd, from, size);
-        List<EventState> eventStates = states.stream()
-                .map(EventState::valueOf)
-                .collect(Collectors.toList());
 
-        var startTime = LocalDateTime.parse(rangeStart, ofPattern(DATE_TIME_FORMAT));
-        var endTime = LocalDateTime.parse(rangeEnd, ofPattern(DATE_TIME_FORMAT));
+        List<EventState> eventStates = null == states ? null :
+                states.stream()
+                        .map(EventState::from)
+                        .map(eventState -> eventState.orElse(null))
+                        .collect(Collectors.toList());
+
+        var startTime = null != rangeStart ? LocalDateTime.parse(rangeStart, ofPattern(DATE_TIME_FORMAT)) : null;
+        var endTime = null != rangeEnd ? LocalDateTime.parse(rangeEnd, ofPattern(DATE_TIME_FORMAT)) : null;
 
         PageRequest pageRequest = PageRequest.of(from / size, size);
         return eventService.findEventsByAdmin(users, eventStates, categories, startTime, endTime, pageRequest);

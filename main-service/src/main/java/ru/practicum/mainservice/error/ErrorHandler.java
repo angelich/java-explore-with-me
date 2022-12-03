@@ -1,11 +1,13 @@
 package ru.practicum.mainservice.error;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import javax.validation.ConstraintViolationException;
 import java.util.Collections;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -21,6 +23,28 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(BAD_REQUEST)
     public ErrorResponse handleValidationException(IllegalArgumentException e) {
+        log.warn("Bad request, message={}", e.getMessage());
+        return new ErrorResponse(
+                Collections.emptySet(),
+                e.getLocalizedMessage(),
+                "For the requested operation the conditions are not met.",
+                BAD_REQUEST.getReasonPhrase());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(BAD_REQUEST)
+    public ErrorResponse handleValidationException(MissingServletRequestParameterException e) {
+        log.warn("Bad request, message={}", e.getMessage());
+        return new ErrorResponse(
+                Collections.emptySet(),
+                e.getLocalizedMessage(),
+                "For the requested operation the conditions are not met.",
+                BAD_REQUEST.getReasonPhrase());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(BAD_REQUEST)
+    public ErrorResponse handleValidationException(MethodArgumentNotValidException e) {
         log.warn("Bad request, message={}", e.getMessage());
         return new ErrorResponse(
                 Collections.emptySet(),
@@ -53,10 +77,10 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(CONFLICT)
-    public ErrorResponse handleConstraintViolationException(ConstraintViolationException e) {
+    public ErrorResponse handleConstraintViolationException(DataIntegrityViolationException e) {
         log.warn("Constraint validation exception, message={}", e.getMessage());
         return new ErrorResponse(
-                e.getConstraintViolations(),
+                Collections.emptySet(),
                 e.getLocalizedMessage(),
                 "Integrity constraint has been violated.",
                 CONFLICT.getReasonPhrase());

@@ -71,7 +71,7 @@ public final class EventMapper {
                 .paid(request.getPaid())
                 .requestModeration(request.getRequestModeration())
                 .created(now())
-                .state(EventState.AWAITING)
+                .state(EventState.PENDING)
                 .locationLat(request.getLocation().getLat())
                 .locationLon(request.getLocation().getLon())
                 .category(category)
