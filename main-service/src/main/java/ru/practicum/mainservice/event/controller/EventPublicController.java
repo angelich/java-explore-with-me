@@ -36,14 +36,28 @@ public class EventPublicController {
                                    @RequestParam(name = "onlyAvailable", defaultValue = "false") Boolean onlyAvailable,
                                    @RequestParam(name = "sort") String sort,
                                    @RequestParam(name = "from", defaultValue = "0") Integer from,
-                                   @RequestParam(name = "size", defaultValue = "10") Integer size) {
+                                   @RequestParam(name = "size", defaultValue = "10") Integer size,
+                                   HttpServletRequest request) {
         log.info("Request events with params: text={}, categories={}, paid={}, rangeStart={}, rangeEnd={}, onlyAvailable={}, sort={}, from={}, size={}",
                 text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+
+        log.info("client ip: {}", request.getRemoteAddr());
+        log.info("endpoint path: {}", request.getRequestURI());
 
         EventSortType sortType = EventSortType.from(sort)
                 .orElseThrow(() -> new IllegalArgumentException("Unknown state: " + sort));
         PageRequest pageRequest = PageRequest.of(from / size, size);
-        return eventService.findEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sortType, pageRequest);
+        return eventService.findEvents(
+                text,
+                categories,
+                paid,
+                rangeStart,
+                rangeEnd,
+                onlyAvailable,
+                sortType,
+                pageRequest,
+                request.getRemoteAddr(),
+                request.getRequestURI());
     }
 
     @GetMapping("/{id}")

@@ -67,8 +67,20 @@ public class EventServiceImpl implements EventService {
                 .map(EventMapper::toEventFullDto)
                 .collect(Collectors.toList());
 
+        List<String> uris = events
+                .stream()
+                .map(it -> "/events/" + it.getId())
+                .collect(Collectors.toList());
+
+        List<ViewStats> stats = getEventsStats(now().minusMonths(1L), now(), uris, false);
+
         events.forEach(it -> {
-            // it.setViews();
+            var viewsStats = stats.
+                    stream()
+                    .filter(viewStats -> viewStats.getUri().equals("/events/" + it.getId()))
+                    .findFirst();
+            var views = viewsStats.isPresent() ? viewsStats.get().getHits() : 0L;
+            it.setViews(views);
             it.setConfirmedRequests(requestRepository.countRequestByEvent_Id(it.getId()));
         });
         return events;
@@ -84,7 +96,12 @@ public class EventServiceImpl implements EventService {
         var updatedEvent = eventRepository.save(toEvent(savedEvent, editEventRequest, eventCategory));
         var eventFullDto = toEventFullDto(updatedEvent);
 
-        // eventFullDto.setViews();
+        var viewsStats = getEventsStats(savedEvent.getCreated(), now(), List.of("/events/" + savedEvent.getId()), false)
+                .stream()
+                .findFirst();
+        var views = viewsStats.isPresent() ? viewsStats.get().getHits() : 0L;
+        eventFullDto.setViews(views);
+
         eventFullDto.setConfirmedRequests(requestRepository.countRequestByEvent_Id(eventId));
         return eventFullDto;
     }
@@ -97,7 +114,13 @@ public class EventServiceImpl implements EventService {
         savedEvent.setPublished(now());
         var updatedEvent = eventRepository.save(savedEvent);
         var eventFullDto = toEventFullDto(updatedEvent);
-        // eventFullDto.setViews();
+
+        var viewsStats = getEventsStats(savedEvent.getCreated(), now(), List.of("/events/" + savedEvent.getId()), false)
+                .stream()
+                .findFirst();
+        var views = viewsStats.isPresent() ? viewsStats.get().getHits() : 0L;
+        eventFullDto.setViews(views);
+
         eventFullDto.setConfirmedRequests(requestRepository.countRequestByEvent_Id(eventId));
         return eventFullDto;
     }
@@ -109,7 +132,13 @@ public class EventServiceImpl implements EventService {
         savedEvent.setState(CANCELLED);
         var updatedEvent = eventRepository.save(savedEvent);
         var eventFullDto = toEventFullDto(updatedEvent);
-        // eventFullDto.setViews();
+
+        var viewsStats = getEventsStats(savedEvent.getCreated(), now(), List.of("/events/" + savedEvent.getId()), false)
+                .stream()
+                .findFirst();
+        var views = viewsStats.isPresent() ? viewsStats.get().getHits() : 0L;
+        eventFullDto.setViews(views);
+
         eventFullDto.setConfirmedRequests(requestRepository.countRequestByEvent_Id(eventId));
         return eventFullDto;
     }
@@ -123,8 +152,20 @@ public class EventServiceImpl implements EventService {
                 .map(EventMapper::toEventShortDto)
                 .collect(Collectors.toList());
 
+        List<String> uris = eventShortDtoList
+                .stream()
+                .map(it -> "/events/" + it.getId())
+                .collect(Collectors.toList());
+
+        List<ViewStats> stats = getEventsStats(now().minusMonths(1L), now(), uris, false);
+
         eventShortDtoList.forEach(it -> {
-            //it.setViews();
+            var viewsStats = stats.
+                    stream()
+                    .filter(viewStats -> viewStats.getUri().equals("/events/" + it.getId()))
+                    .findFirst();
+            var views = viewsStats.isPresent() ? viewsStats.get().getHits() : 0L;
+            it.setViews(views);
             it.setConfirmedRequests(requestRepository.countRequestByEvent_Id(it.getId()));
         });
         return eventShortDtoList;
@@ -172,7 +213,13 @@ public class EventServiceImpl implements EventService {
 
         savedEvent.setState(EventState.AWAITING);
         var eventFullDto = toEventFullDto(eventRepository.save(savedEvent));
-        // eventFullDto.setViews();
+
+        var viewsStats = getEventsStats(savedEvent.getCreated(), now(), List.of("/events/" + savedEvent.getId()), false)
+                .stream()
+                .findFirst();
+        var views = viewsStats.isPresent() ? viewsStats.get().getHits() : 0L;
+        eventFullDto.setViews(views);
+
         eventFullDto.setConfirmedRequests(requestRepository.countRequestByEvent_Id(savedEvent.getId()));
         return eventFullDto;
     }
@@ -189,7 +236,13 @@ public class EventServiceImpl implements EventService {
 
         var savedEvent = eventRepository.save(toEvent(newEventDto, eventCategory, user));
         var eventFullDto = toEventFullDto(savedEvent);
-        // eventFullDto.setViews();
+
+        var viewsStats = getEventsStats(savedEvent.getCreated(), now(), List.of("/events/" + savedEvent.getId()), false)
+                .stream()
+                .findFirst();
+        var views = viewsStats.isPresent() ? viewsStats.get().getHits() : 0L;
+        eventFullDto.setViews(views);
+
         eventFullDto.setConfirmedRequests(requestRepository.countRequestByEvent_Id(savedEvent.getId()));
         return eventFullDto;
 
@@ -205,7 +258,13 @@ public class EventServiceImpl implements EventService {
             throw new ForbiddenException("For the requested operation the conditions are not met");
         }
         var eventFullDto = toEventFullDto(event);
-        // eventFullDto.setViews();
+
+        var viewsStats = getEventsStats(event.getCreated(), now(), List.of("/events/" + event.getId()), false)
+                .stream()
+                .findFirst();
+        var views = viewsStats.isPresent() ? viewsStats.get().getHits() : 0L;
+        eventFullDto.setViews(views);
+
         eventFullDto.setConfirmedRequests(requestRepository.countRequestByEvent_Id(eventId));
         return eventFullDto;
     }
@@ -221,7 +280,14 @@ public class EventServiceImpl implements EventService {
         }
         event.setState(CANCELLED);
         var eventFullDto = toEventFullDto(eventRepository.save(event));
-        // eventFullDto.setViews();
+
+        var viewsStats = getEventsStats(event.getCreated(), now(), List.of("/events/" + event.getId()), false)
+                .stream()
+                .findFirst();
+
+        var views = viewsStats.isPresent() ? viewsStats.get().getHits() : 0L;
+        eventFullDto.setViews(views);
+
         eventFullDto.setConfirmedRequests(requestRepository.countRequestByEvent_Id(eventId));
         return eventFullDto;
     }
@@ -234,7 +300,11 @@ public class EventServiceImpl implements EventService {
                                           LocalDateTime rangeEnd,
                                           Boolean onlyAvailable,
                                           EventSortType sortType,
-                                          PageRequest pageRequest) {
+                                          PageRequest pageRequest,
+                                          String remoteIp,
+                                          String requestURI) {
+        client.hit(new EndpointHitDto("app", requestURI, remoteIp, now().format(ofPattern(DATE_TIME_FORMAT))));
+
         BooleanBuilder builder = new BooleanBuilder();
 
         if (text != null) {
@@ -255,16 +325,31 @@ public class EventServiceImpl implements EventService {
         var events = eventRepository.findAll(builder, pageRequest);
 
         //BooleanExpression byAvailable = QEvent.event.participantLimit.lt(QRequest.request.);
-        // в конце сорировка еще?
+
         var eventsShortDtoList = events
                 .stream()
                 .map(EventMapper::toEventShortDto)
                 .collect(Collectors.toList());
 
+        List<String> uris = events
+                .stream()
+                .map(it -> "/events/" + it.getId())
+                .collect(Collectors.toList());
+
+        List<ViewStats> stats = getEventsStats(now().minusMonths(1L), now(), uris, false);
+
         eventsShortDtoList.forEach(it -> {
-            // it.setViews();
+            var viewsStats = stats.
+                    stream()
+                    .filter(viewStats -> viewStats.getUri().equals("/events/" + it.getId()))
+                    .findFirst();
+            var views = viewsStats.isPresent() ? viewsStats.get().getHits() : 0L;
+            it.setViews(views);
             it.setConfirmedRequests(requestRepository.countRequestByEvent_Id(it.getId()));
         });
+
+        // в конце сорировка еще?
+
         return eventsShortDtoList;
     }
 
@@ -279,13 +364,13 @@ public class EventServiceImpl implements EventService {
         client.hit(new EndpointHitDto("app", requestURI, remoteIp, now().format(ofPattern(DATE_TIME_FORMAT))));
 
         var eventFullDto = toEventFullDto(event);
-        Long views = getEventsStats(event.getCreated(), now(), List.of(requestURI), false)
-                .stream()
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Empty stats for event: " + eventId))
-                .getHits();
 
+        var viewsStats = getEventsStats(event.getCreated(), now(), List.of("/events/" + event.getId()), false)
+                .stream()
+                .findFirst();
+        var views = viewsStats.isPresent() ? viewsStats.get().getHits() : 0L;
         eventFullDto.setViews(views);
+
         eventFullDto.setConfirmedRequests(requestRepository.countRequestByEvent_Id(eventId));
         return eventFullDto;
     }

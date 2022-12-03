@@ -36,7 +36,16 @@ public interface EventService {
 
     EventFullDto cancelEvent(Long userId, Long eventId);
 
-    List<EventShortDto> findEvents(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, EventSortType sortType, PageRequest pageRequest);
+    List<EventShortDto> findEvents(String text,
+                                   List<Long> categories,
+                                   Boolean paid,
+                                   LocalDateTime rangeStart,
+                                   LocalDateTime rangeEnd,
+                                   Boolean onlyAvailable,
+                                   EventSortType sortType,
+                                   PageRequest pageRequest,
+                                   String remoteIp,
+                                   String requestURI);
 
     EventFullDto getEvent(Long id, String remoteIp, String requestURI);
 }
