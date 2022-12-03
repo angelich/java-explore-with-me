@@ -21,7 +21,7 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 @Log4j2
 public class StatsController {
     private final StatsService statsService;
-    private static final String dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+    private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     @PostMapping("/hit")
     EndpointHit hit(@RequestBody EndpointHit endpointHit) {
@@ -34,8 +34,8 @@ public class StatsController {
                              @RequestParam(name = "uris", required = false) List<String> uris,
                              @RequestParam(name = "unique", defaultValue = "false") Boolean unique) {
         log.info("Get stats with params: start={}, end={}, uris={}, unique={}", start, end, uris, unique);
-        var startTime = LocalDateTime.parse(start, ofPattern(dateTimeFormat));
-        var endTime = LocalDateTime.parse(end, ofPattern(dateTimeFormat));
+        var startTime = LocalDateTime.parse(start, ofPattern(DATE_TIME_FORMAT));
+        var endTime = LocalDateTime.parse(end, ofPattern(DATE_TIME_FORMAT));
         return statsService.getStats(startTime, endTime, uris, unique);
     }
 }

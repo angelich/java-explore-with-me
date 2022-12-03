@@ -1,14 +1,17 @@
 package ru.practicum.mainservice.client;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestOperations;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.statservice.stats.model.EndpointHitDto;
 import ru.practicum.statservice.stats.model.ViewStats;
 
@@ -20,20 +23,24 @@ import static org.springframework.http.HttpMethod.POST;
 
 @Component
 public class StatServiceClient {
+    private final RestOperations rest;
     private static final String HIT_ENDPOINT = "/hit";
     private static final String STATS_ENDPOINT = "/stats";
-    private final RestOperations rest = new RestTemplate();
-    @Value("${stat-service.url}")
-    private String host;
+
+    @Autowired
+    StatServiceClient(@Value("${stat-service.url}") String host, RestTemplateBuilder builder) {
+        this.rest = builder
+                .uriTemplateHandler(new DefaultUriBuilderFactory(host))
+                .requestFactory(HttpComponentsClientHttpRequestFactory::new)
+                .build();
+    }
 
     public void hit(EndpointHitDto hit) {
-        String path = host + HIT_ENDPOINT;
         HttpHeaders headers = defaultHeaders();
-
         HttpEntity<EndpointHitDto> requestEntity = new HttpEntity<>(hit, headers);
 
         ResponseEntity<Object> response = rest.exchange(
-                path,
+                HIT_ENDPOINT,
                 POST,
                 requestEntity,
                 Object.class);
@@ -44,7 +51,7 @@ public class StatServiceClient {
     }
 
     public List<ViewStats> getStats(Map<String, Object> parameters) {
-        String path = host + STATS_ENDPOINT;
+        String path = STATS_ENDPOINT + "?start={start}&end={end}&uris={uris}&unique={unique}";
 
         HttpHeaders headers = defaultHeaders();
 

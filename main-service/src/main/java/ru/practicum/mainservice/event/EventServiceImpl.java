@@ -18,12 +18,15 @@ import ru.practicum.mainservice.event.model.UpdateEventRequest;
 import ru.practicum.mainservice.request.RequestRepository;
 import ru.practicum.mainservice.user.UserRepository;
 import ru.practicum.statservice.stats.model.EndpointHitDto;
+import ru.practicum.statservice.stats.model.ViewStats;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.time.LocalDateTime.now;
+import static java.time.format.DateTimeFormatter.ofPattern;
 import static ru.practicum.mainservice.event.EventMapper.toEvent;
 import static ru.practicum.mainservice.event.EventMapper.toEventFullDto;
 import static ru.practicum.mainservice.event.EventState.CANCELLED;
@@ -37,6 +40,8 @@ public class EventServiceImpl implements EventService {
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
     private final StatServiceClient client;
+
+    private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     @Override
     public List<EventFullDto> findEventsByAdmin(
@@ -89,6 +94,7 @@ public class EventServiceImpl implements EventService {
         var savedEvent = eventRepository.findById(eventId).orElseThrow(
                 () -> new NotFoundException("Event not exist"));
         savedEvent.setState(PUBLISHED);
+        savedEvent.setPublished(now());
         var updatedEvent = eventRepository.save(savedEvent);
         var eventFullDto = toEventFullDto(updatedEvent);
         // eventFullDto.setViews();
@@ -270,11 +276,26 @@ public class EventServiceImpl implements EventService {
             throw new ForbiddenException("For the requested operation the conditions are not met");
         }
 
-        client.hit(new EndpointHitDto("app", requestURI, remoteIp, now()));
+        client.hit(new EndpointHitDto("app", requestURI, remoteIp, now().format(ofPattern(DATE_TIME_FORMAT))));
 
         var eventFullDto = toEventFullDto(event);
-        // eventFullDto.setViews();
+        Long views = getEventsStats(event.getCreated(), now(), List.of(requestURI), false)
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Empty stats for event: " + eventId))
+                .getHits();
+
+        eventFullDto.setViews(views);
         eventFullDto.setConfirmedRequests(requestRepository.countRequestByEvent_Id(eventId));
         return eventFullDto;
+    }
+
+    private List<ViewStats> getEventsStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
+        Map<String, Object> parameters = Map.of(
+                "start", start.format(ofPattern(DATE_TIME_FORMAT)),
+                "end", end.format(ofPattern(DATE_TIME_FORMAT)),
+                "uris", String.join(",", uris),
+                "unique", unique);
+        return client.getStats(parameters);
     }
 }

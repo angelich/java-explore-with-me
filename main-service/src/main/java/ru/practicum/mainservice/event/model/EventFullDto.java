@@ -34,7 +34,7 @@ public class EventFullDto {
     private UserDto initiator;
     private Location location;
     private Boolean paid;
-    private Integer views;
+    private Long views;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdOn;
