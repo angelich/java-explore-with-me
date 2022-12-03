@@ -6,7 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.mainservice.category.CategoryRepository;
+import ru.practicum.mainservice.client.EndpointHitDto;
 import ru.practicum.mainservice.client.StatServiceClient;
+import ru.practicum.mainservice.client.ViewStats;
 import ru.practicum.mainservice.error.ForbiddenException;
 import ru.practicum.mainservice.error.NotFoundException;
 import ru.practicum.mainservice.event.model.AdminUpdateEventRequest;
@@ -17,8 +19,6 @@ import ru.practicum.mainservice.event.model.QEvent;
 import ru.practicum.mainservice.event.model.UpdateEventRequest;
 import ru.practicum.mainservice.request.RequestRepository;
 import ru.practicum.mainservice.user.UserRepository;
-import ru.practicum.statservice.stats.model.EndpointHitDto;
-import ru.practicum.statservice.stats.model.ViewStats;
 
 import java.time.LocalDateTime;
 import java.util.List;

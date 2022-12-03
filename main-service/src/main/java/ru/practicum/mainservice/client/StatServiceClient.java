@@ -12,8 +12,6 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.DefaultUriBuilderFactory;
-import ru.practicum.statservice.stats.model.EndpointHitDto;
-import ru.practicum.statservice.stats.model.ViewStats;
 
 import java.util.List;
 import java.util.Map;
