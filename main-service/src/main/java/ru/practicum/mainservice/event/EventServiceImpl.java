@@ -21,6 +21,7 @@ import ru.practicum.mainservice.request.RequestRepository;
 import ru.practicum.mainservice.user.UserRepository;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -29,6 +30,8 @@ import static java.time.LocalDateTime.now;
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static ru.practicum.mainservice.event.EventMapper.toEvent;
 import static ru.practicum.mainservice.event.EventMapper.toEventFullDto;
+import static ru.practicum.mainservice.event.EventSortType.EVENT_DATE;
+import static ru.practicum.mainservice.event.EventSortType.VIEWS;
 import static ru.practicum.mainservice.event.EventState.CANCELLED;
 import static ru.practicum.mainservice.event.EventState.PUBLISHED;
 
@@ -348,7 +351,11 @@ public class EventServiceImpl implements EventService {
             it.setConfirmedRequests(requestRepository.countRequestByEvent_Id(it.getId()));
         });
 
-        // в конце сорировка еще?
+        if (EVENT_DATE == sortType) {
+            eventsShortDtoList.sort(Comparator.comparing(EventShortDto::getEventDate));
+        } else if (VIEWS == sortType) {
+            eventsShortDtoList.sort(Comparator.comparing(EventShortDto::getViews));
+        }
 
         return eventsShortDtoList;
     }

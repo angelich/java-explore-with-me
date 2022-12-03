@@ -31,13 +31,13 @@ public class EventPublicController {
     private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     @GetMapping
-    List<EventShortDto> findEvents(@RequestParam(name = "text") String text,
-                                   @RequestParam(name = "categories") List<Long> categories,
-                                   @RequestParam(name = "paid") Boolean paid,
-                                   @RequestParam(name = "rangeStart") String rangeStart,
-                                   @RequestParam(name = "rangeEnd") String rangeEnd,
+    List<EventShortDto> findEvents(@RequestParam(name = "text", required = false) String text,
+                                   @RequestParam(name = "categories", required = false) List<Long> categories,
+                                   @RequestParam(name = "paid", required = false) Boolean paid,
+                                   @RequestParam(name = "rangeStart", required = false) String rangeStart,
+                                   @RequestParam(name = "rangeEnd", required = false) String rangeEnd,
                                    @RequestParam(name = "onlyAvailable", defaultValue = "false") Boolean onlyAvailable,
-                                   @RequestParam(name = "sort") String sort,
+                                   @RequestParam(name = "sort", required = false) String sort,
                                    @RequestParam(name = "from", defaultValue = "0") Integer from,
                                    @RequestParam(name = "size", defaultValue = "10") Integer size,
                                    HttpServletRequest request) {
@@ -50,8 +50,7 @@ public class EventPublicController {
         var startTime = LocalDateTime.parse(rangeStart, ofPattern(DATE_TIME_FORMAT));
         var endTime = LocalDateTime.parse(rangeEnd, ofPattern(DATE_TIME_FORMAT));
 
-        EventSortType sortType = EventSortType.from(sort)
-                .orElseThrow(() -> new IllegalArgumentException("Unknown state: " + sort));
+        EventSortType sortType = EventSortType.from(sort).orElse(null);
         PageRequest pageRequest = PageRequest.of(from / size, size);
         return eventService.findEvents(
                 text,
