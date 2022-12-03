@@ -75,8 +75,8 @@ public class EventServiceImpl implements EventService {
         List<ViewStats> stats = getEventsStats(now().minusMonths(1L), now(), uris, false);
 
         events.forEach(it -> {
-            var viewsStats = stats.
-                    stream()
+            var viewsStats = stats
+                    .stream()
                     .filter(viewStats -> viewStats.getUri().equals("/events/" + it.getId()))
                     .findFirst();
             var views = viewsStats.isPresent() ? viewsStats.get().getHits() : 0L;
@@ -160,8 +160,8 @@ public class EventServiceImpl implements EventService {
         List<ViewStats> stats = getEventsStats(now().minusMonths(1L), now(), uris, false);
 
         eventShortDtoList.forEach(it -> {
-            var viewsStats = stats.
-                    stream()
+            var viewsStats = stats
+                    .stream()
                     .filter(viewStats -> viewStats.getUri().equals("/events/" + it.getId()))
                     .findFirst();
             var views = viewsStats.isPresent() ? viewsStats.get().getHits() : 0L;
@@ -339,8 +339,8 @@ public class EventServiceImpl implements EventService {
         List<ViewStats> stats = getEventsStats(now().minusMonths(1L), now(), uris, false);
 
         eventsShortDtoList.forEach(it -> {
-            var viewsStats = stats.
-                    stream()
+            var viewsStats = stats
+                    .stream()
                     .filter(viewStats -> viewStats.getUri().equals("/events/" + it.getId()))
                     .findFirst();
             var views = viewsStats.isPresent() ? viewsStats.get().getHits() : 0L;
