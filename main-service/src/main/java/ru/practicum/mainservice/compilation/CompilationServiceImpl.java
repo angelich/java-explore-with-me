@@ -55,6 +55,12 @@ public class CompilationServiceImpl implements CompilationService {
     public CompilationDto createCompilation(NewCompilationDto dto) {
         List<Event> events = eventRepository.findAllById(dto.getEvents());
         var compilation = compilationRepository.save(toCompilation(dto, events));
+        compilation.setEvents(events);
+        var updatedCompilation = compilationRepository.save(compilation);
+        events.forEach(event -> {
+            event.getCompilations().add(updatedCompilation);
+            eventRepository.save(event);
+        });
         return toCompilationDto(compilation);
     }
 
@@ -71,8 +77,9 @@ public class CompilationServiceImpl implements CompilationService {
                 () -> new NotFoundException("Compilation not found"));
         var event = eventRepository.findById(eventId).orElseThrow(
                 () -> new NotFoundException("Event not exist"));
-        compilation.getEvents().remove(event); //надо ли удалять из ивента компиляцию?
+        compilation.getEvents().remove(event);
         event.getCompilations().remove(compilation);
+        eventRepository.save(event);
         compilationRepository.save(compilation);
     }
 
@@ -82,8 +89,9 @@ public class CompilationServiceImpl implements CompilationService {
                 () -> new NotFoundException("Compilation not found"));
         var event = eventRepository.findById(eventId).orElseThrow(
                 () -> new NotFoundException("Event not exist"));
-        compilation.getEvents().add(event); //надо ли удалять из ивента компиляцию?
+        compilation.getEvents().add(event);
         event.getCompilations().add(compilation);
+        eventRepository.save(event);
         compilationRepository.save(compilation);
     }
 
