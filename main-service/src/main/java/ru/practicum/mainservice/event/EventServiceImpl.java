@@ -31,7 +31,7 @@ import static ru.practicum.mainservice.event.EventMapper.toEvent;
 import static ru.practicum.mainservice.event.EventMapper.toEventFullDto;
 import static ru.practicum.mainservice.event.EventSortType.EVENT_DATE;
 import static ru.practicum.mainservice.event.EventSortType.VIEWS;
-import static ru.practicum.mainservice.event.EventState.CANCELLED;
+import static ru.practicum.mainservice.event.EventState.CANCELED;
 import static ru.practicum.mainservice.event.EventState.PUBLISHED;
 
 @Service
@@ -97,7 +97,7 @@ public class EventServiceImpl implements EventService {
     public EventFullDto editEventByAdmin(Long eventId, AdminUpdateEventRequest editEventRequest) {
         var savedEvent = eventRepository.findById(eventId).orElseThrow(
                 () -> new NotFoundException("Event not exist"));
-        var eventCategory = categoryRepository.findById(editEventRequest.getCategory().getId()).orElseThrow(
+        var eventCategory = categoryRepository.findById(editEventRequest.getCategory()).orElseThrow(
                 () -> new NotFoundException("Category not exist"));
 
         var updatedEvent = eventRepository.save(toEvent(savedEvent, editEventRequest, eventCategory));
@@ -136,7 +136,7 @@ public class EventServiceImpl implements EventService {
     public EventFullDto rejectEvent(Long eventId) {
         var savedEvent = eventRepository.findById(eventId).orElseThrow(
                 () -> new NotFoundException("Event not exist"));
-        savedEvent.setState(CANCELLED);
+        savedEvent.setState(CANCELED);
         var updatedEvent = eventRepository.save(savedEvent);
         var eventFullDto = toEventFullDto(updatedEvent);
 
@@ -184,10 +184,10 @@ public class EventServiceImpl implements EventService {
                 () -> new NotFoundException("User not exist"));
         var savedEvent = eventRepository.findById(updateEventRequest.getEventId()).orElseThrow(
                 () -> new NotFoundException("Event not exist"));
-        var eventCategory = categoryRepository.findById(updateEventRequest.getCategory().getId()).orElseThrow(
+        var eventCategory = categoryRepository.findById(updateEventRequest.getCategory()).orElseThrow(
                 () -> new NotFoundException("Category not exist"));
 
-        if (savedEvent.getInitiator() != user) {
+        if (!savedEvent.getInitiator().equals(user)) {
             throw new ForbiddenException("For the requested operation the conditions are not met");
         }
         if (PUBLISHED == savedEvent.getState()) {
@@ -261,7 +261,7 @@ public class EventServiceImpl implements EventService {
                 () -> new NotFoundException("User not exist"));
         var event = eventRepository.findById(eventId).orElseThrow(
                 () -> new NotFoundException("Event not exist"));
-        if (event.getInitiator().equals(user)) {
+        if (!event.getInitiator().equals(user)) {
             throw new ForbiddenException("For the requested operation the conditions are not met");
         }
         var eventFullDto = toEventFullDto(event);
@@ -282,10 +282,10 @@ public class EventServiceImpl implements EventService {
                 () -> new NotFoundException("User not exist"));
         var event = eventRepository.findById(eventId).orElseThrow(
                 () -> new NotFoundException("Event not exist"));
-        if (event.getInitiator().equals(user)) {
+        if (!event.getInitiator().equals(user)) {
             throw new ForbiddenException("For the requested operation the conditions are not met");
         }
-        event.setState(CANCELLED);
+        event.setState(CANCELED);
         var eventFullDto = toEventFullDto(eventRepository.save(event));
 
         var viewsStats = getEventsStats(event.getCreated(), now(), List.of("/events/" + event.getId()), false)

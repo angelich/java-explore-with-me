@@ -9,7 +9,7 @@ import java.util.List;
 public interface RequestRepository extends JpaRepository<Request, Long> {
     Integer countRequestByEvent_Id(Long eventId);
 
-    List<Request> findAllByRequester_IdAndEvent_Id(Long userId, Long eventId);
+    List<Request> findAllByEvent_Id(Long eventId);
 
     boolean existsAllByRequester_IdAndEvent_Id(Long userId, Long eventId);
 

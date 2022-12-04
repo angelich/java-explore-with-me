@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import static java.time.LocalDateTime.now;
 import static ru.practicum.mainservice.event.EventState.PUBLISHED;
 import static ru.practicum.mainservice.request.RequestMapper.toParticipationRequestDto;
+import static ru.practicum.mainservice.request.RequestStatus.CANCELED;
 import static ru.practicum.mainservice.request.RequestStatus.CONFIRMED;
 import static ru.practicum.mainservice.request.RequestStatus.PENDING;
 import static ru.practicum.mainservice.request.RequestStatus.REJECTED;
@@ -28,11 +29,14 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public List<ParticipationRequestDto> getEventRequests(Long userId, Long eventId) {
-        userRepository.findById(userId).orElseThrow(
+        var user = userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException("User not exist"));
-        eventRepository.findById(eventId).orElseThrow(
+        var event = eventRepository.findById(eventId).orElseThrow(
                 () -> new NotFoundException("Event not exist"));
-        return requestRepository.findAllByRequester_IdAndEvent_Id(userId, eventId)
+        if (!event.getInitiator().equals(user)) {
+            throw new ForbiddenException("For the requested operation the conditions are not met");
+        }
+        return requestRepository.findAllByEvent_Id(eventId)
                 .stream()
                 .map(RequestMapper::toParticipationRequestDto)
                 .collect(Collectors.toList());
@@ -118,7 +122,7 @@ public class RequestServiceImpl implements RequestService {
                 () -> new NotFoundException("User not exist"));
         var request = requestRepository.findById(requestId).orElseThrow(
                 () -> new NotFoundException("Request not exist"));
-        request.setStatus(REJECTED);
+        request.setStatus(CANCELED);
         var rejectedRequest = requestRepository.save(request);
         return toParticipationRequestDto(rejectedRequest);
     }

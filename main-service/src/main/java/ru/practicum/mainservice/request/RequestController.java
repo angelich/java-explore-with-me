@@ -22,6 +22,7 @@ import java.util.List;
 @RequestMapping(path = "/users/{userId}/requests")
 public class RequestController {
     private final RequestService requestService;
+    private Long requestId;
 
     @GetMapping
     List<ParticipationRequestDto> getUserRequests(@PathVariable(name = "userId") Long userId) {
@@ -38,7 +39,7 @@ public class RequestController {
 
     @PatchMapping("/{requestId}/cancel")
     ParticipationRequestDto cancelUserRequest(@PathVariable(name = "userId") Long userId,
-                                              @PathVariable(name = "requestId ") Long requestId) {
+                                              @PathVariable(name = "requestId") Long requestId) {
         log.info("Cancel user request: user={}, request={}", userId, requestId);
         return requestService.cancelUserRequest(userId, requestId);
     }

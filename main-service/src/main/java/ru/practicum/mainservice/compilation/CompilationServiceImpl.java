@@ -62,7 +62,7 @@ public class CompilationServiceImpl implements CompilationService {
     public void deleteCompilation(Long compId) {
         compilationRepository.findById(compId).orElseThrow(
                 () -> new NotFoundException("Compilation not found"));
-        eventRepository.deleteById(compId);
+        compilationRepository.deleteById(compId);
     }
 
     @Override
@@ -72,6 +72,7 @@ public class CompilationServiceImpl implements CompilationService {
         var event = eventRepository.findById(eventId).orElseThrow(
                 () -> new NotFoundException("Event not exist"));
         compilation.getEvents().remove(event); //надо ли удалять из ивента компиляцию?
+        event.getCompilations().remove(compilation);
         compilationRepository.save(compilation);
     }
 
@@ -82,6 +83,7 @@ public class CompilationServiceImpl implements CompilationService {
         var event = eventRepository.findById(eventId).orElseThrow(
                 () -> new NotFoundException("Event not exist"));
         compilation.getEvents().add(event); //надо ли удалять из ивента компиляцию?
+        event.getCompilations().add(compilation);
         compilationRepository.save(compilation);
     }
 
