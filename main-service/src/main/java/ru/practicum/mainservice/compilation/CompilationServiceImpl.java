@@ -17,6 +17,8 @@ import java.util.stream.Collectors;
 
 import static ru.practicum.mainservice.compilation.CompilationMapper.toCompilation;
 import static ru.practicum.mainservice.compilation.CompilationMapper.toCompilationDto;
+import static ru.practicum.mainservice.error.Errors.COMPILATION_NOT_FOUND;
+import static ru.practicum.mainservice.error.Errors.EVENT_NOT_EXIST;
 
 @Service
 @RequiredArgsConstructor
@@ -47,7 +49,7 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public CompilationDto getOneCompilation(Long compId) {
         var compilation = compilationRepository.findById(compId).orElseThrow(
-                () -> new NotFoundException("Compilation not found"));
+                () -> new NotFoundException(COMPILATION_NOT_FOUND.getMessage()));
         return toCompilationDto(compilation);
     }
 
@@ -67,16 +69,16 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public void deleteCompilation(Long compId) {
         compilationRepository.findById(compId).orElseThrow(
-                () -> new NotFoundException("Compilation not found"));
+                () -> new NotFoundException(COMPILATION_NOT_FOUND.getMessage()));
         compilationRepository.deleteById(compId);
     }
 
     @Override
     public void deleteEventFromCompilation(Long compId, Long eventId) {
         var compilation = compilationRepository.findById(compId).orElseThrow(
-                () -> new NotFoundException("Compilation not found"));
+                () -> new NotFoundException(COMPILATION_NOT_FOUND.getMessage()));
         var event = eventRepository.findById(eventId).orElseThrow(
-                () -> new NotFoundException("Event not exist"));
+                () -> new NotFoundException(EVENT_NOT_EXIST.getMessage()));
         compilation.getEvents().remove(event);
         event.getCompilations().remove(compilation);
         eventRepository.save(event);
@@ -86,9 +88,9 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public void addEventToCompilation(Long compId, Long eventId) {
         var compilation = compilationRepository.findById(compId).orElseThrow(
-                () -> new NotFoundException("Compilation not found"));
+                () -> new NotFoundException(COMPILATION_NOT_FOUND.getMessage()));
         var event = eventRepository.findById(eventId).orElseThrow(
-                () -> new NotFoundException("Event not exist"));
+                () -> new NotFoundException(EVENT_NOT_EXIST.getMessage()));
         compilation.getEvents().add(event);
         event.getCompilations().add(compilation);
         eventRepository.save(event);
@@ -98,7 +100,7 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public void unpinCompilation(Long compId) {
         var compilation = compilationRepository.findById(compId).orElseThrow(
-                () -> new NotFoundException("Compilation not found"));
+                () -> new NotFoundException(COMPILATION_NOT_FOUND.getMessage()));
         compilation.setPinned(false);
         compilationRepository.save(compilation);
     }
@@ -106,7 +108,7 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public void pinCompilation(Long compId) {
         var compilation = compilationRepository.findById(compId).orElseThrow(
-                () -> new NotFoundException("Compilation not found"));
+                () -> new NotFoundException(COMPILATION_NOT_FOUND.getMessage()));
         compilation.setPinned(true);
         compilationRepository.save(compilation);
     }

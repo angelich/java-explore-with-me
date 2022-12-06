@@ -27,6 +27,12 @@ import java.util.stream.Collectors;
 
 import static java.time.LocalDateTime.now;
 import static java.time.format.DateTimeFormatter.ofPattern;
+import static ru.practicum.mainservice.error.Errors.CATEGORY_NOT_EXIST;
+import static ru.practicum.mainservice.error.Errors.EVENT_NOT_EXIST;
+import static ru.practicum.mainservice.error.Errors.EVENT_SHOULD_BE_PUBLISHED;
+import static ru.practicum.mainservice.error.Errors.EVENT_TIME_SHOULD_NOT_BE_EARLIER_THAN;
+import static ru.practicum.mainservice.error.Errors.FORBIDDEN_MESSAGE;
+import static ru.practicum.mainservice.error.Errors.USER_NOT_EXIST;
 import static ru.practicum.mainservice.event.EventMapper.toEvent;
 import static ru.practicum.mainservice.event.EventMapper.toEventFullDto;
 import static ru.practicum.mainservice.event.EventSortType.EVENT_DATE;
@@ -96,18 +102,14 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto editEventByAdmin(Long eventId, AdminUpdateEventRequest editEventRequest) {
         var savedEvent = eventRepository.findById(eventId).orElseThrow(
-                () -> new NotFoundException("Event not exist"));
+                () -> new NotFoundException(EVENT_NOT_EXIST.getMessage()));
         var eventCategory = categoryRepository.findById(editEventRequest.getCategory()).orElseThrow(
-                () -> new NotFoundException("Category not exist"));
+                () -> new NotFoundException(CATEGORY_NOT_EXIST.getMessage()));
 
         var updatedEvent = eventRepository.save(toEvent(savedEvent, editEventRequest, eventCategory));
         var eventFullDto = toEventFullDto(updatedEvent);
 
-        var viewsStats = getEventsStats(savedEvent.getCreated(), now(), List.of("/events/" + savedEvent.getId()), false)
-                .stream()
-                .findFirst();
-        var views = viewsStats.isPresent() ? viewsStats.get().getHits() : 0L;
-        eventFullDto.setViews(views);
+        setViews(eventFullDto);
 
         eventFullDto.setConfirmedRequests(requestRepository.countRequestByEvent_Id(eventId));
         return eventFullDto;
@@ -116,17 +118,13 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto publishEvent(Long eventId) {
         var savedEvent = eventRepository.findById(eventId).orElseThrow(
-                () -> new NotFoundException("Event not exist"));
+                () -> new NotFoundException(EVENT_NOT_EXIST.getMessage()));
         savedEvent.setState(PUBLISHED);
         savedEvent.setPublished(now());
         var updatedEvent = eventRepository.save(savedEvent);
         var eventFullDto = toEventFullDto(updatedEvent);
 
-        var viewsStats = getEventsStats(savedEvent.getCreated(), now(), List.of("/events/" + savedEvent.getId()), false)
-                .stream()
-                .findFirst();
-        var views = viewsStats.isPresent() ? viewsStats.get().getHits() : 0L;
-        eventFullDto.setViews(views);
+        setViews(eventFullDto);
 
         eventFullDto.setConfirmedRequests(requestRepository.countRequestByEvent_Id(eventId));
         return eventFullDto;
@@ -135,16 +133,12 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto rejectEvent(Long eventId) {
         var savedEvent = eventRepository.findById(eventId).orElseThrow(
-                () -> new NotFoundException("Event not exist"));
+                () -> new NotFoundException(EVENT_NOT_EXIST.getMessage()));
         savedEvent.setState(CANCELED);
         var updatedEvent = eventRepository.save(savedEvent);
         var eventFullDto = toEventFullDto(updatedEvent);
 
-        var viewsStats = getEventsStats(savedEvent.getCreated(), now(), List.of("/events/" + savedEvent.getId()), false)
-                .stream()
-                .findFirst();
-        var views = viewsStats.isPresent() ? viewsStats.get().getHits() : 0L;
-        eventFullDto.setViews(views);
+        setViews(eventFullDto);
 
         eventFullDto.setConfirmedRequests(requestRepository.countRequestByEvent_Id(eventId));
         return eventFullDto;
@@ -153,7 +147,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<EventShortDto> getUserEvents(Long userId, PageRequest pageRequest) {
         var user = userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException("User not exist"));
+                () -> new NotFoundException(USER_NOT_EXIST.getMessage()));
         var eventShortDtoList = eventRepository.findAllByInitiator(user, pageRequest)
                 .stream()
                 .map(EventMapper::toEventShortDto)
@@ -181,17 +175,17 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto updateEvent(Long userId, UpdateEventRequest updateEventRequest) {
         var user = userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException("User not exist"));
+                () -> new NotFoundException(USER_NOT_EXIST.getMessage()));
         var savedEvent = eventRepository.findById(updateEventRequest.getEventId()).orElseThrow(
-                () -> new NotFoundException("Event not exist"));
+                () -> new NotFoundException(EVENT_NOT_EXIST.getMessage()));
         var eventCategory = categoryRepository.findById(updateEventRequest.getCategory()).orElseThrow(
-                () -> new NotFoundException("Category not exist"));
+                () -> new NotFoundException(CATEGORY_NOT_EXIST.getMessage()));
 
         if (!savedEvent.getInitiator().equals(user)) {
-            throw new ForbiddenException("For the requested operation the conditions are not met");
+            throw new ForbiddenException(FORBIDDEN_MESSAGE.getMessage());
         }
         if (PUBLISHED == savedEvent.getState()) {
-            throw new IllegalArgumentException("Only pending or canceled events can be changed");
+            throw new IllegalArgumentException(EVENT_SHOULD_BE_PUBLISHED.getMessage());
         }
         if (updateEventRequest.getAnnotation() != null) {
             savedEvent.setAnnotation(updateEventRequest.getAnnotation());
@@ -213,7 +207,7 @@ public class EventServiceImpl implements EventService {
         }
         if (updateEventRequest.getEventDate() != null) {
             if (updateEventRequest.getEventDate().isBefore(now().plusHours(2L))) {
-                throw new IllegalArgumentException("Event time should not be earlier than: " + now().plusHours(2L));
+                throw new IllegalArgumentException(EVENT_TIME_SHOULD_NOT_BE_EARLIER_THAN.getMessage() + now().plusHours(2L));
             }
             savedEvent.setEventDate(updateEventRequest.getEventDate());
         }
@@ -221,11 +215,7 @@ public class EventServiceImpl implements EventService {
         savedEvent.setState(EventState.PENDING);
         var eventFullDto = toEventFullDto(eventRepository.save(savedEvent));
 
-        var viewsStats = getEventsStats(savedEvent.getCreated(), now(), List.of("/events/" + savedEvent.getId()), false)
-                .stream()
-                .findFirst();
-        var views = viewsStats.isPresent() ? viewsStats.get().getHits() : 0L;
-        eventFullDto.setViews(views);
+        setViews(eventFullDto);
 
         eventFullDto.setConfirmedRequests(requestRepository.countRequestByEvent_Id(savedEvent.getId()));
         return eventFullDto;
@@ -234,21 +224,17 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
         var user = userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException("User not exist"));
+                () -> new NotFoundException(USER_NOT_EXIST.getMessage()));
         var eventCategory = categoryRepository.findById(newEventDto.getCategory()).orElseThrow(
-                () -> new NotFoundException("Category not exist"));
+                () -> new NotFoundException(CATEGORY_NOT_EXIST.getMessage()));
         if (newEventDto.getEventDate().isBefore(now().plusHours(2L))) {
-            throw new IllegalArgumentException("Event time should not be earlier than: " + now().plusHours(2L));
+            throw new IllegalArgumentException(EVENT_TIME_SHOULD_NOT_BE_EARLIER_THAN.getMessage() + now().plusHours(2L));
         }
 
         var savedEvent = eventRepository.save(toEvent(newEventDto, eventCategory, user));
         var eventFullDto = toEventFullDto(savedEvent);
 
-        var viewsStats = getEventsStats(savedEvent.getCreated(), now(), List.of("/events/" + savedEvent.getId()), false)
-                .stream()
-                .findFirst();
-        var views = viewsStats.isPresent() ? viewsStats.get().getHits() : 0L;
-        eventFullDto.setViews(views);
+        setViews(eventFullDto);
 
         eventFullDto.setConfirmedRequests(requestRepository.countRequestByEvent_Id(savedEvent.getId()));
         return eventFullDto;
@@ -258,19 +244,15 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto getFullEventInfo(Long userId, Long eventId) {
         var user = userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException("User not exist"));
+                () -> new NotFoundException(USER_NOT_EXIST.getMessage()));
         var event = eventRepository.findById(eventId).orElseThrow(
-                () -> new NotFoundException("Event not exist"));
+                () -> new NotFoundException(EVENT_NOT_EXIST.getMessage()));
         if (!event.getInitiator().equals(user)) {
-            throw new ForbiddenException("For the requested operation the conditions are not met");
+            throw new ForbiddenException(FORBIDDEN_MESSAGE.getMessage());
         }
         var eventFullDto = toEventFullDto(event);
 
-        var viewsStats = getEventsStats(event.getCreated(), now(), List.of("/events/" + event.getId()), false)
-                .stream()
-                .findFirst();
-        var views = viewsStats.isPresent() ? viewsStats.get().getHits() : 0L;
-        eventFullDto.setViews(views);
+        setViews(eventFullDto);
 
         eventFullDto.setConfirmedRequests(requestRepository.countRequestByEvent_Id(eventId));
         return eventFullDto;
@@ -279,21 +261,16 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto cancelEvent(Long userId, Long eventId) {
         var user = userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException("User not exist"));
+                () -> new NotFoundException(USER_NOT_EXIST.getMessage()));
         var event = eventRepository.findById(eventId).orElseThrow(
-                () -> new NotFoundException("Event not exist"));
+                () -> new NotFoundException(EVENT_NOT_EXIST.getMessage()));
         if (!event.getInitiator().equals(user)) {
-            throw new ForbiddenException("For the requested operation the conditions are not met");
+            throw new ForbiddenException(FORBIDDEN_MESSAGE.getMessage());
         }
         event.setState(CANCELED);
         var eventFullDto = toEventFullDto(eventRepository.save(event));
 
-        var viewsStats = getEventsStats(event.getCreated(), now(), List.of("/events/" + event.getId()), false)
-                .stream()
-                .findFirst();
-
-        var views = viewsStats.isPresent() ? viewsStats.get().getHits() : 0L;
-        eventFullDto.setViews(views);
+        setViews(eventFullDto);
 
         eventFullDto.setConfirmedRequests(requestRepository.countRequestByEvent_Id(eventId));
         return eventFullDto;
@@ -337,7 +314,6 @@ public class EventServiceImpl implements EventService {
 
         var events = eventRepository.findAll(builder, pageRequest);
 
-
         var eventsShortDtoList = events
                 .stream()
                 .map(EventMapper::toEventShortDto)
@@ -372,20 +348,16 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto getEvent(Long eventId, String remoteIp, String requestURI) {
         var event = eventRepository.findById(eventId).orElseThrow(
-                () -> new NotFoundException("Event not exist"));
+                () -> new NotFoundException(EVENT_NOT_EXIST.getMessage()));
         if (PUBLISHED != event.getState()) {
-            throw new ForbiddenException("For the requested operation the conditions are not met");
+            throw new ForbiddenException(FORBIDDEN_MESSAGE.getMessage());
         }
 
         client.hit(new EndpointHitDto("app", requestURI, remoteIp, now().format(ofPattern(DATE_TIME_FORMAT))));
 
         var eventFullDto = toEventFullDto(event);
 
-        var viewsStats = getEventsStats(event.getCreated(), now(), List.of("/events/" + event.getId()), false)
-                .stream()
-                .findFirst();
-        var views = viewsStats.isPresent() ? viewsStats.get().getHits() : 0L;
-        eventFullDto.setViews(views);
+        setViews(eventFullDto);
 
         eventFullDto.setConfirmedRequests(requestRepository.countRequestByEvent_Id(eventId));
         return eventFullDto;
@@ -398,5 +370,13 @@ public class EventServiceImpl implements EventService {
                 "uris", String.join(",", uris),
                 "unique", unique);
         return client.getStats(parameters);
+    }
+
+    private void setViews(EventFullDto dto) {
+        var viewsStats = getEventsStats(dto.getCreatedOn(), now(), List.of("/events/" + dto.getId()), false)
+                .stream()
+                .findFirst();
+        var views = viewsStats.isPresent() ? viewsStats.get().getHits() : 0L;
+        dto.setViews(views);
     }
 }

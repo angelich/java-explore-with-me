@@ -8,8 +8,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.Collections;
+import javax.validation.ConstraintViolationException;
 
+import static java.util.Collections.emptySet;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -20,34 +21,14 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @Slf4j
 public class ErrorHandler {
 
-    @ExceptionHandler
+    @ExceptionHandler({
+            IllegalArgumentException.class, MissingServletRequestParameterException.class, MethodArgumentNotValidException.class
+    })
     @ResponseStatus(BAD_REQUEST)
-    public ErrorResponse handleValidationException(IllegalArgumentException e) {
+    public ErrorResponse handleValidationException(RuntimeException e) {
         log.warn("Bad request, message={}", e.getMessage());
         return new ErrorResponse(
-                Collections.emptySet(),
-                e.getLocalizedMessage(),
-                "For the requested operation the conditions are not met.",
-                BAD_REQUEST.getReasonPhrase());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(BAD_REQUEST)
-    public ErrorResponse handleValidationException(MissingServletRequestParameterException e) {
-        log.warn("Bad request, message={}", e.getMessage());
-        return new ErrorResponse(
-                Collections.emptySet(),
-                e.getLocalizedMessage(),
-                "For the requested operation the conditions are not met.",
-                BAD_REQUEST.getReasonPhrase());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(BAD_REQUEST)
-    public ErrorResponse handleValidationException(MethodArgumentNotValidException e) {
-        log.warn("Bad request, message={}", e.getMessage());
-        return new ErrorResponse(
-                Collections.emptySet(),
+                emptySet(),
                 e.getLocalizedMessage(),
                 "For the requested operation the conditions are not met.",
                 BAD_REQUEST.getReasonPhrase());
@@ -58,7 +39,7 @@ public class ErrorHandler {
     public ErrorResponse handleForbiddenException(ForbiddenException e) {
         log.warn("Forbidden request, message={}", e.getMessage());
         return new ErrorResponse(
-                Collections.emptySet(),
+                emptySet(),
                 e.getMessage(),
                 "Certain rights are required for this action.",
                 FORBIDDEN.getReasonPhrase());
@@ -69,19 +50,19 @@ public class ErrorHandler {
     public ErrorResponse handleNotFoundException(NotFoundException e) {
         log.warn("Not found, message={}", e.getMessage());
         return new ErrorResponse(
-                Collections.emptySet(),
+                emptySet(),
                 e.getMessage(),
                 "The required object was not found.",
                 NOT_FOUND.getReasonPhrase());
     }
 
-    @ExceptionHandler
+    @ExceptionHandler({ConstraintViolationException.class, DataIntegrityViolationException.class})
     @ResponseStatus(CONFLICT)
-    public ErrorResponse handleConstraintViolationException(DataIntegrityViolationException e) {
+    public ErrorResponse handleConstraintViolationException(RuntimeException e) {
         log.warn("Constraint validation exception, message={}", e.getMessage());
         return new ErrorResponse(
-                Collections.emptySet(),
-                e.getLocalizedMessage(),
+                emptySet(),
+                e.getMessage(),
                 "Integrity constraint has been violated.",
                 CONFLICT.getReasonPhrase());
     }
@@ -91,7 +72,7 @@ public class ErrorHandler {
     public ErrorResponse handleOtherExceptions(Throwable e) {
         log.error("Internal error, message={}", e.getMessage());
         return new ErrorResponse(
-                Collections.emptySet(),
+                emptySet(),
                 e.getLocalizedMessage(),
                 "Error occurred.",
                 INTERNAL_SERVER_ERROR.getReasonPhrase());

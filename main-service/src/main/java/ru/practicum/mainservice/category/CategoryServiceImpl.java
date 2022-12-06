@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import static ru.practicum.mainservice.category.CategoryMapper.toCategory;
 import static ru.practicum.mainservice.category.CategoryMapper.toCategoryDto;
+import static ru.practicum.mainservice.error.Errors.CATEGORY_NOT_EXIST;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +29,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto getOneCategory(Long categoryId) {
         var category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new NotFoundException("Not found category with id=" + categoryId));
+                .orElseThrow(() -> new NotFoundException(CATEGORY_NOT_EXIST.getMessage()));
         return toCategoryDto(category);
     }
 
