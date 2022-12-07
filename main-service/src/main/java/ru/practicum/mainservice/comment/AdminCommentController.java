@@ -36,13 +36,13 @@ public class AdminCommentController {
     @ResponseStatus(HttpStatus.OK)
     void publishComment(@PathVariable(name = "commentId") Long commentId) {
         log.info("Publish comment={}", commentId);
-        commentService.publishComment(commentId);
+        commentService.changeCommentStatus(commentId, CommentStatus.PUBLISHED);
     }
 
     @PatchMapping("/reject")
     @ResponseStatus(HttpStatus.OK)
     void rejectComment(@PathVariable(name = "commentId") Long commentId) {
         log.info("Reject comment={}", commentId);
-        commentService.rejectComment(commentId);
+        commentService.changeCommentStatus(commentId, CommentStatus.REJECTED);
     }
 }

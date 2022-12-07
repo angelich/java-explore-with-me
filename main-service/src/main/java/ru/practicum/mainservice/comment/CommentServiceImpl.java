@@ -15,7 +15,6 @@ import static ru.practicum.mainservice.comment.CommentMapper.toComment;
 import static ru.practicum.mainservice.comment.CommentMapper.toCommentDto;
 import static ru.practicum.mainservice.comment.CommentStatus.AWAITING_MODERATION;
 import static ru.practicum.mainservice.comment.CommentStatus.PUBLISHED;
-import static ru.practicum.mainservice.comment.CommentStatus.REJECTED;
 
 @Service
 @RequiredArgsConstructor
@@ -43,18 +42,10 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void publishComment(Long commentId) {
+    public void changeCommentStatus(Long commentId, CommentStatus status) {
         var comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new NotFoundException("Comment not exist"));
-        comment.setStatus(PUBLISHED);
-        commentRepository.save(comment);
-    }
-
-    @Override
-    public void rejectComment(Long commentId) {
-        var comment = commentRepository.findById(commentId).orElseThrow(
-                () -> new NotFoundException("Comment not exist"));
-        comment.setStatus(REJECTED);
+        comment.setStatus(status);
         commentRepository.save(comment);
     }
 

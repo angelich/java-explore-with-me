@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import ru.practicum.mainservice.comment.CommentStatus;
 import ru.practicum.mainservice.event.model.Event;
 import ru.practicum.mainservice.user.model.User;
@@ -38,6 +39,7 @@ public class Comment {
     @Column(nullable = false)
     private String text;
 
+    @CreationTimestamp
     private LocalDateTime created;
 
     @ManyToOne
