@@ -15,6 +15,9 @@
 Собрать пакеты:
 > mvn package
 
-Запустить в контейнерах:
+Собрать docker-контейнеры:
+> docker-compose build
+
+Запустить в docker-контейнерах:
 > docker compose up
 
