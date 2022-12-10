@@ -13,7 +13,7 @@
 # Запуск проекта
 
 Собрать пакеты:
-> mvn package
+> mvn clean package
 
 Собрать docker-контейнеры:
 > docker-compose build
