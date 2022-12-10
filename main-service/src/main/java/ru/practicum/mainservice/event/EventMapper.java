@@ -27,7 +27,6 @@ public final class EventMapper {
                 .annotation(event.getAnnotation())
                 .description(event.getDescription())
                 .category(new CategoryDto(event.getCategory().getId(), event.getCategory().getName()))
-                // .confirmedRequests(confirmedRequests)
                 .eventDate(event.getEventDate())
                 .initiator(toUserDto(event.getInitiator()))
                 .location(new Location(event.getLocationLat(), event.getLocationLon()))

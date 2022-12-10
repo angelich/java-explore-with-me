@@ -2,6 +2,7 @@ package ru.practicum.mainservice.category;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.mainservice.category.model.CategoryDto;
 import ru.practicum.mainservice.validation.Create;
 import ru.practicum.mainservice.validation.Update;
+
+import static ru.practicum.mainservice.error.Errors.CATEGORY_ALREADY_EXIST;
 
 
 /**
@@ -31,13 +34,21 @@ public class CategoryAdminController {
     @PatchMapping
     CategoryDto updateCategory(@Validated(Update.class) @RequestBody CategoryDto categoryDto) {
         log.info("Updating category={}", categoryDto);
-        return categoryService.updateCategory(categoryDto);
+        try {
+            return categoryService.updateCategory(categoryDto);
+        } catch (DataIntegrityViolationException e) {
+            throw new DataIntegrityViolationException(CATEGORY_ALREADY_EXIST.getMessage());
+        }
     }
 
     @PostMapping
     CategoryDto createCategory(@Validated(Create.class) @RequestBody CategoryDto categoryDto) {
         log.info("Creating category={}", categoryDto);
-        return categoryService.createCategory(categoryDto);
+        try {
+            return categoryService.createCategory(categoryDto);
+        } catch (DataIntegrityViolationException e) {
+            throw new DataIntegrityViolationException(CATEGORY_ALREADY_EXIST.getMessage());
+        }
     }
 
     @DeleteMapping(path = "/{catId}")

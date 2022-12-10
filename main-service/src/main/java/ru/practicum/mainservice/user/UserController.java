@@ -2,6 +2,7 @@ package ru.practicum.mainservice.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -18,6 +19,8 @@ import ru.practicum.mainservice.user.model.UserDto;
 import ru.practicum.mainservice.validation.Create;
 
 import java.util.List;
+
+import static ru.practicum.mainservice.error.Errors.USER_ALREADY_EXIST;
 
 
 /**
@@ -43,7 +46,11 @@ public class UserController {
     @PostMapping
     UserDto createUser(@Validated(Create.class) @RequestBody UserDto userDto) {
         log.info("Creating new user={}", userDto);
-        return userService.createUser(userDto);
+        try {
+            return userService.createUser(userDto);
+        } catch (DataIntegrityViolationException e) {
+            throw new DataIntegrityViolationException(USER_ALREADY_EXIST.getMessage());
+        }
     }
 
     @DeleteMapping(path = "/{userId}")
