@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.mainservice.comment.CommentService;
-import ru.practicum.mainservice.comment.model.CommentDto;
+import ru.practicum.mainservice.comment.model.CommentResponseDto;
 import ru.practicum.mainservice.event.EventService;
 import ru.practicum.mainservice.event.EventSortType;
 import ru.practicum.mainservice.event.model.EventFullDto;
@@ -77,9 +77,9 @@ public class EventPublicController {
     }
 
     @GetMapping("/{eventId}/comments")
-    List<CommentDto> getEventComments(@PathVariable(name = "eventId") Long eventId,
-                                      @RequestParam(name = "from", defaultValue = "0") Integer from,
-                                      @RequestParam(name = "size", defaultValue = "10") Integer size) {
+    List<CommentResponseDto> getEventComments(@PathVariable(name = "eventId") Long eventId,
+                                              @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                              @RequestParam(name = "size", defaultValue = "10") Integer size) {
         log.info("Get event comments: event={}, from={}, size={}", eventId, from, size);
         PageRequest pageRequest = PageRequest.of(from / size, size);
         return commentService.getEventComments(eventId, pageRequest);

@@ -1,7 +1,8 @@
 package ru.practicum.mainservice.comment;
 
 import org.springframework.data.domain.PageRequest;
-import ru.practicum.mainservice.comment.model.CommentDto;
+import ru.practicum.mainservice.comment.model.CommentRequestDto;
+import ru.practicum.mainservice.comment.model.CommentResponseDto;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -18,13 +19,23 @@ public interface CommentService {
    * @param commentDto Тело запроса на создание комментария
    * @return Созданный комментарий
    */
-  @NotNull CommentDto createComment(Long userId, Long eventId, @NotNull CommentDto commentDto);
+  @NotNull CommentResponseDto createComment(Long userId, Long eventId, @NotNull CommentRequestDto commentDto);
+
+  /**
+   * Обновление комментария к событию
+   *
+   * @param userId     Идентификатор пользователя
+   * @param commentId  Идентификатор комментария
+   * @param commentDto Тело запроса на создание комментария
+   * @return Обновленный комментарий
+   */
+  @NotNull CommentResponseDto updateComment(Long userId, Long commentId, CommentRequestDto commentDto);
 
   /**
    * @param pageRequest Параметр пагинации
    * @return Список комментариев требующих модерации
    */
-  @NotNull List<CommentDto> getCommentsForModeration(PageRequest pageRequest);
+  @NotNull List<CommentResponseDto> getCommentsForModeration(PageRequest pageRequest);
 
   /**
    * Изменение статуса комментария админом
@@ -38,5 +49,5 @@ public interface CommentService {
    * @param pageRequest Параметр пагинации
    * @return Список комментариев конкретного события
    */
-  @NotNull List<CommentDto> getEventComments(Long eventId, PageRequest pageRequest);
+  @NotNull List<CommentResponseDto> getEventComments(Long eventId, PageRequest pageRequest);
 }

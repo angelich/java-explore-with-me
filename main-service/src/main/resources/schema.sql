@@ -73,6 +73,7 @@ CREATE TABLE IF NOT EXISTS comment
     author     BIGINT                                  NOT NULL,
     status     BIGINT                                  NOT NULL,
     event_id   BIGINT                                  NOT NULL,
+    edited     BOOLEAN,
     CONSTRAINT pk_comment PRIMARY KEY (comment_id),
     CONSTRAINT fk_comment_event FOREIGN KEY (event_id) REFERENCES event,
     CONSTRAINT fk_author FOREIGN KEY (author) REFERENCES users

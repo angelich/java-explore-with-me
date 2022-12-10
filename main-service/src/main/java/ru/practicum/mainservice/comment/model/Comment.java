@@ -52,4 +52,6 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "event_id")
     private Event event;
+
+    private boolean edited;
 }

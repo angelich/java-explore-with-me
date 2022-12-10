@@ -13,7 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.mainservice.comment.CommentService;
-import ru.practicum.mainservice.comment.model.CommentDto;
+import ru.practicum.mainservice.comment.model.CommentRequestDto;
+import ru.practicum.mainservice.comment.model.CommentResponseDto;
 import ru.practicum.mainservice.event.EventService;
 import ru.practicum.mainservice.event.model.EventFullDto;
 import ru.practicum.mainservice.event.model.EventShortDto;
@@ -96,10 +97,18 @@ public class EventUserController {
     }
 
     @PostMapping("/{eventId}/comment")
-    CommentDto createComment(@PathVariable(name = "userId") Long userId,
-                             @PathVariable(name = "eventId") Long eventId,
-                             @Valid @RequestBody CommentDto commentDto) {
+    CommentResponseDto createComment(@PathVariable(name = "userId") Long userId,
+                                     @PathVariable(name = "eventId") Long eventId,
+                                     @Valid @RequestBody CommentRequestDto commentDto) {
         log.info("Create comment for event: comment={}, event={}, user={}", commentDto, eventId, userId);
         return commentService.createComment(userId, eventId, commentDto);
+    }
+
+    @PatchMapping("/comment/{commentId}")
+    CommentResponseDto updateComment(@PathVariable(name = "userId") Long userId,
+                                     @PathVariable(name = "commentId") Long commentId,
+                                     @Valid @RequestBody CommentRequestDto commentDto) {
+        log.info("Update comment for event: comment={}, commentId={}, user={}", commentDto, commentId, userId);
+        return commentService.updateComment(userId, commentId, commentDto);
     }
 }
