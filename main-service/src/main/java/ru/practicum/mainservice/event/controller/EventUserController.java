@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.mainservice.comment.CommentService;
+import ru.practicum.mainservice.comment.model.CommentRequestDto;
+import ru.practicum.mainservice.comment.model.CommentResponseDto;
 import ru.practicum.mainservice.event.EventService;
 import ru.practicum.mainservice.event.model.EventFullDto;
 import ru.practicum.mainservice.event.model.EventShortDto;
@@ -31,6 +34,7 @@ import java.util.List;
 public class EventUserController {
     private final EventService eventService;
     private final RequestService requestService;
+    private final CommentService commentService;
 
     @GetMapping
     List<EventShortDto> getUserEvent(@PathVariable(name = "userId") Long userId,
@@ -90,5 +94,21 @@ public class EventUserController {
                                           @PathVariable(name = "reqId") Long reqId) {
         log.info("Reject participation: owner={}, event={}, request={}", userId, eventId, reqId);
         return requestService.rejectRequest(userId, eventId, reqId);
+    }
+
+    @PostMapping("/{eventId}/comment")
+    CommentResponseDto createComment(@PathVariable(name = "userId") Long userId,
+                                     @PathVariable(name = "eventId") Long eventId,
+                                     @Valid @RequestBody CommentRequestDto commentDto) {
+        log.info("Create comment for event: comment={}, event={}, user={}", commentDto, eventId, userId);
+        return commentService.createComment(userId, eventId, commentDto);
+    }
+
+    @PatchMapping("/comment/{commentId}")
+    CommentResponseDto updateComment(@PathVariable(name = "userId") Long userId,
+                                     @PathVariable(name = "commentId") Long commentId,
+                                     @Valid @RequestBody CommentRequestDto commentDto) {
+        log.info("Update comment for event: comment={}, commentId={}, user={}", commentDto, commentId, userId);
+        return commentService.updateComment(userId, commentId, commentDto);
     }
 }

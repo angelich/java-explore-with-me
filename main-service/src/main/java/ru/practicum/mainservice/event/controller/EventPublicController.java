@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.mainservice.comment.CommentService;
+import ru.practicum.mainservice.comment.model.CommentResponseDto;
 import ru.practicum.mainservice.event.EventService;
 import ru.practicum.mainservice.event.EventSortType;
 import ru.practicum.mainservice.event.model.EventFullDto;
@@ -28,6 +30,7 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 @RequestMapping(path = "/events")
 public class EventPublicController {
     private final EventService eventService;
+    private final CommentService commentService;
     private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     @GetMapping
@@ -71,5 +74,14 @@ public class EventPublicController {
         log.info("endpoint path: {}", request.getRequestURI());
         return eventService.getEvent(id, request.getRemoteAddr(), request.getRequestURI());
 
+    }
+
+    @GetMapping("/{eventId}/comments")
+    List<CommentResponseDto> getEventComments(@PathVariable(name = "eventId") Long eventId,
+                                              @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                              @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        log.info("Get event comments: event={}, from={}, size={}", eventId, from, size);
+        PageRequest pageRequest = PageRequest.of(from / size, size);
+        return commentService.getEventComments(eventId, pageRequest);
     }
 }

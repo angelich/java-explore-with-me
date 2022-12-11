@@ -13,8 +13,11 @@
 # Запуск проекта
 
 Собрать пакеты:
-> mvn package
+> mvn clean package
 
-Запустить в контейнерах:
+Собрать docker-контейнеры:
+> docker-compose build
+
+Запустить в docker-контейнерах:
 > docker compose up
 
