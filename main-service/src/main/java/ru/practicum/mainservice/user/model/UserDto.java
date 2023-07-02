@@ -1,5 +1,7 @@
 package ru.practicum.mainservice.user.model;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -8,9 +10,6 @@ import lombok.Setter;
 import lombok.ToString;
 import ru.practicum.mainservice.validation.Create;
 import ru.practicum.mainservice.validation.Update;
-
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
 
 @Getter
 @Setter

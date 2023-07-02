@@ -1,5 +1,6 @@
 package ru.practicum.mainservice.event.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.PageRequest;
@@ -15,7 +16,6 @@ import ru.practicum.mainservice.event.EventSortType;
 import ru.practicum.mainservice.event.model.EventFullDto;
 import ru.practicum.mainservice.event.model.EventShortDto;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.List;
 

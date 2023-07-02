@@ -1,10 +1,10 @@
 package ru.practicum.mainservice.comment;
 
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.PageRequest;
 import ru.practicum.mainservice.comment.model.CommentRequestDto;
 import ru.practicum.mainservice.comment.model.CommentResponseDto;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**

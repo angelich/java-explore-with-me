@@ -1,5 +1,12 @@
 version: '3.1'
 services:
+  frontend:
+    ports:
+      - "8090:8090"
+    container_name: frontend
+    build: ./frontend
+    image: frontend
+
   stats-server:
     ports:
       - "9090:9090"
