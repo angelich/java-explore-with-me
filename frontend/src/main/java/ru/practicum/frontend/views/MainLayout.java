@@ -2,56 +2,60 @@ package ru.practicum.frontend.views;
 
 
 import com.vaadin.flow.component.applayout.AppLayout;
-import com.vaadin.flow.component.applayout.DrawerToggle;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Footer;
-import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.Header;
-import com.vaadin.flow.component.orderedlayout.Scroller;
-import com.vaadin.flow.component.sidenav.SideNav;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 
+import static com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode.CENTER;
+
 /**
- * The main view is a top-level placeholder for other views.
+ * Главный слой для публичной части сайта
  */
 public class MainLayout extends AppLayout {
 
     private H2 viewTitle;
 
     public MainLayout() {
-        setPrimarySection(Section.DRAWER);
-        addDrawerContent();
         addHeaderContent();
+        createFooter();
     }
 
     private void addHeaderContent() {
-        DrawerToggle toggle = new DrawerToggle();
-        toggle.getElement().setAttribute("aria-label", "Menu toggle");
+        //если метод станет слишком большой - разбить на маленькие
+        // TODO поменять на меню бар https://vaadin.com/docs/latest/components/menu-bar
+        var allCategories = new Button("Главная");
+        var quests = new Button("Квесты");
+        var concerts = new Button("Концерты");
+        var active = new Button("Активный отдых");
+
+
+        quests.addClickListener(e ->
+                quests.getUI().ifPresent(ui ->
+                        ui.navigate("list")));
+
+
+        var search = new TextField();
+        search.setTooltipText("Введите интересующее вас событие");
+        search.setPlaceholder("Поиск событий");
+        search.setClearButtonVisible(true);
 
         viewTitle = new H2();
-        viewTitle.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
+        viewTitle.addClassNames(LumoUtility.FontSize.LARGE);
 
-        addToNavbar(true, toggle, viewTitle);
-    }
+        var categories = new HorizontalLayout(CENTER, viewTitle, allCategories, quests, concerts, active, search);
+        categories.setPadding(true);
+        categories.setMaxWidth("1000");
+        categories.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
 
-    private void addDrawerContent() {
-        H1 appName = new H1("My App");
-        appName.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
-        Header header = new Header(appName);
 
-        Scroller scroller = new Scroller(createNavigation());
-
-        addToDrawer(header, scroller, createFooter());
-    }
-
-    private SideNav createNavigation() {
-        SideNav nav = new SideNav();
-
-/*        nav.addItem(new SideNavItem("Hello World", HelloWorldView.class, LineAwesomeIcon.GLOBE_SOLID.create()));
-        nav.addItem(new SideNavItem("About", AboutView.class, LineAwesomeIcon.FILE.create()));*/
-
-        return nav;
+        var verticalLayout = new VerticalLayout(FlexComponent.Alignment.CENTER, categories);
+        addToNavbar(true, verticalLayout);
     }
 
     private Footer createFooter() {
